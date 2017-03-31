@@ -34,7 +34,10 @@ return (
    <Route path="/" component={App}>
      <IndexRoute component={Home} />
      <Route path="signup" component={SignupForm} />
+     <Route path="signin" component={SigninForm} />
+     <Route path="activate" component={ActivePage} />
      <Route path="features" component={AuthenticationScreen(Features)} />
+     <Route path="signout" component={Signout} />
    </Route>
  </Router>
 )
