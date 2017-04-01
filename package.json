@@ -1,0 +1,45 @@
+{
+  "name": "twreporter-registration",
+  "version": "1.1.0",
+  "description": "registration signin system ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "gulp": "gulp",
+    "dev": "npm run gulp"
+  },
+  "keywords": [
+    "registration",
+    "signin",
+    "signup"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twreporter/registration.git"
+  },
+  "author": "hanyulo",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-es2017": "^6.22.0",
+    "babel-preset-react": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "concurrently": "^3.4.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-rename": "^1.2.2",
+    "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "react": "^15.4.1",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.5.1",
+    "redux": "^3.5.2",
+    "redux-form": "^6.5.0",
+    "redux-thunk": "^2.2.0",
+    "superagent": "^3.5.1"
+  }
+}
