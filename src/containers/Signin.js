@@ -9,11 +9,6 @@ const _ = {
 }
 
 class Signin extends React.Component {
-  static fetchData() {
-    return new Promise((resolve) => {
-      resolve()
-    })
-  }
 
   static contextTypes = {
     router: React.PropTypes.object
@@ -46,6 +41,7 @@ class Signin extends React.Component {
     // this.props.oAuthFB()
   }
 
+  // PH == plaseholder
   generateInput() {
     const PHMap = {
       [EMAIL]: 'Enter your email address',

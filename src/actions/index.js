@@ -72,8 +72,7 @@ export function activateUser({ email, activeCode }, callback) {
       .end((err, res) => {
         if (err || !res.ok) {
           dispatch(authError(err))
-        }
-         else {
+        } else {
            const webStatus = res.status
            const parsedRes = JSON.parse(res.text);
            const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
