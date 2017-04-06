@@ -65,7 +65,7 @@ class Signin extends React.Component {
           <button type="submit" value="Submit">Sign In</button>
         </form>
         <button >
-          <a href="http://testtest.twreporter.org:8080/v1/auth/facebook?location=http://testtest.twreporter.org:3000/">Facebook</a>
+          <a href="http://testtest.twreporter.org:8080/v1/auth/facebook?location=http://testtest.twreporter.org:3000&domain=twreporter.org">Facebook</a>
         </button>
         <button >
           <a href="http://testtest.twreporter.org:8080/v1/auth/google">Google</a>
