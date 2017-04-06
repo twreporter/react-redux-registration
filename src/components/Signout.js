@@ -16,7 +16,7 @@ class Signout extends React.Component {
     return(
       <div>
       <div>You are now logged out of The Reporter, please sign in again</div>
-      <a href="http://testtest.twreporter.org/:3000/signin">signin</a>
+      <a href="http://testtest.twreporter.org:3000/signin">signin</a>
       </div>
     )
   }

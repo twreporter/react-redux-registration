@@ -7,7 +7,7 @@ var paths = {
   containers: './src/containers/*.js',
   components: './src/components/*.js',
   reducers: './src/reducers/*.js',
-  actions:  './src/actions/*.js'
+  actions:  './src/actions/**/*.js'
 };
 
 var theBase = { base: 'src' };
@@ -65,11 +65,11 @@ gulp.task('actions', () => {
 // Rerun the task when a file changes
 gulp.task('watch', function() {
   gulp.watch('./index_dev.js', ['index']);
-  gulp.watch(paths.root, ['root']);
+  // gulp.watch(paths.root, ['root']);
   gulp.watch(paths.components, ['components']);
   gulp.watch(paths.containers, ['containers']);
   gulp.watch(paths.reducers, ['reducers']);
   gulp.watch(paths.actions, ['actions']);
 });
 
-gulp.task('default', ['watch', 'index', 'root', 'components', 'containers', 'reducers', 'actions']);
+gulp.task('default', ['watch', 'index', 'components', 'containers', 'reducers', 'actions']);
