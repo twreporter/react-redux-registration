@@ -1,8 +1,10 @@
 export const messagesSet = {
-  request: {
-    signup: 'Sign Up Request',
-    activate: 'Active Request',
-    signin: 'Sign In Request'
+  authProcess: {
+    signupReq: 'Sign Up Request',
+    activationReq: 'Active Request',
+    signinReq: 'Sign In Request',
+    authUser: 'User is authenticated successfully',
+    unauthUser: 'User signed out'
   },
   app: {
     afterSignUp: 'You will receive an E-mail. Please check your mail box.'

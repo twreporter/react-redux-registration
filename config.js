@@ -1,6 +1,6 @@
 module.exports = {
-  apiHost: process.env.APIHOST || 'http://testtest.twreporter.org',
-  apiPort: process.env.APIPORT || 8080,
+  apiHost: 'http://testtest.twreporter.org',
+  apiPort: 8080,
   apiEndPoint: {
     google: '/v1/auth/google',
     facebook: '/v1/auth/facebook',

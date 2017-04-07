@@ -6,7 +6,7 @@ var paths = {
   root: './src/**/*.js',
   containers: './src/containers/*.js',
   components: './src/components/*.js',
-  reducers: './src/reducers/*.js',
+  reducers: './src/reducers/**/*.js',
   actions:  './src/actions/**/*.js'
 };
 

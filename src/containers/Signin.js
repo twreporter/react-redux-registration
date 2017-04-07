@@ -3,6 +3,12 @@ import { connect } from 'react-redux'
 import { get } from 'lodash'
 import { signinUser, oAuthFacebook, oAuthGoogle } from '../actions'
 import { EMAIL, PASSWORD } from './constants'
+import { apiHost, apiPort, apiEndPoint } from '../../config'
+
+const API_URL = `${apiHost}:${apiPort}`
+const query = 'location=http://testtest.twreporter.org:3000&domain=twreporter.org'
+const fbLoginUrl = `${API_URL}${apiEndPoint.facebook}?${query}`
+const googleLoginUrl = `${API_URL}${apiEndPoint.google}?${query}`
 
 const _ = {
   get,
@@ -65,10 +71,10 @@ class Signin extends React.Component {
           <button type="submit" value="Submit">Sign In</button>
         </form>
         <button >
-          <a href="http://testtest.twreporter.org:8080/v1/auth/facebook?location=http://testtest.twreporter.org:3000&domain=twreporter.org">Facebook</a>
+          <a href={fbLoginUrl}>Facebook</a>
         </button>
         <button >
-          <a href="http://testtest.twreporter.org:8080/v1/auth/google">Google</a>
+          <a href={googleLoginUrl}>Google</a>
         </button>
         { this.props.messages ? <div>{this.props.messages}</div> : <div></div>}
         { this.props.autherrorMessages ? <div>{this.props.autherrorMessages}</div> : <div></div>}

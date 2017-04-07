@@ -34,7 +34,8 @@ export function fetchMessages(message) {
 
 export function authUser() {
   return {
-    type: AUTH_USER
+    type: AUTH_USER,
+    payload: messagesSet.authProcess.unauthUser
   }
 }
 
@@ -46,13 +47,14 @@ export function signoutUser() {
   }
   return {
     type: UNAUTH_USER,
+    payload: messagesSet.authProcess.authUser
   }
 }
 
 
 export function signupUser({ email, password}) {
   return function(dispatch) {
-    dispatch(authReq(messagesSet.request.signup))
+    dispatch(authReq(messagesSet.authProcess.signupReq))
     return request.post(`${API_URL}${apiEndPoint.signup}`)
       .set('Content-Type', 'application/json')
       .send({ email, password })
@@ -66,7 +68,7 @@ export function signupUser({ email, password}) {
 
 export function activateUser({ email, activeCode }, callback) {
   return function(dispatch) {
-    dispatch(authReq(messagesSet.request.activate))
+    dispatch(authReq(messagesSet.authProcess.activationReq))
     return request.get(`${API_URL}${apiEndPoint.activate}?email=${email}&token=${activeCode}`)
       .then((res) => {
         const webStatus = res.status
@@ -86,7 +88,7 @@ export function activateUser({ email, activeCode }, callback) {
 
 export function signinUser({ email, password}, callback) {
   return function(dispatch) {
-    dispatch(authReq(messagesSet.request.signin))
+    dispatch(authReq(messagesSet.authProcess.signinReq))
     return request.post(`${API_URL}${apiEndPoint.signin}`)
       .set('Content-Type', 'application/json')
       .send({ email, password })
@@ -105,22 +107,3 @@ export function signinUser({ email, password}, callback) {
       })
   }
 }
-
-// export function oAuthFacebook() {
-//   return function(dispatch) {
-//     dispatch(authReq('Sign In O Auth Request'))
-//     request.get(`${API_URL}/v1/auth/facebook`)
-//       .end((err, res) => {
-//         if (err || !res.ok) {
-//           dispatch(authError(err))
-//         } else {
-//           const webStatus = res.status
-//           const parsedRes = JSON.parse(res.text);
-//           const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
-//           if(browserLocalStorage){
-//             browserLocalStorage.setItem('token', parsedRes.jwt)
-//           }
-//         }
-//       })
-//   }
-// }
