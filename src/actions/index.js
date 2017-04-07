@@ -2,7 +2,7 @@ import request from 'superagent'
 import { AUTH_USER, UNAUTH_USER, AUTH_ERROR, FETCH_MESSAGE, AUTH_REQ } from './types'
 import { omit } from 'lodash'
 import { apiHost, apiPort, apiEndPoint } from '../../config'
-import { messagesSet } from './constant'
+import { messagesSet } from './constants'
 
 const _ = {
   omit

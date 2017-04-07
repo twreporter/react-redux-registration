@@ -2,7 +2,7 @@
 'use strict'
 import * as types from '../types'
 import * as actions from '../index'
-import { messagesSet } from '../constant'
+import { messagesSet } from '../constants'
 import { mockDefaultStates, mockResponseSet, mockParameterSet } from './mocks'
 import { apiHost, apiPort, apiEndPoint } from '../../../config'
 
