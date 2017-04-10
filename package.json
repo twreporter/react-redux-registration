@@ -1,6 +1,6 @@
 {
   "name": "twreporter-registration",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "registration signin system ",
   "main": "index.js",
   "scripts": {
