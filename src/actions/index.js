@@ -44,6 +44,7 @@ export function signoutUser() {
   if(browserLocalStorage){
     browserLocalStorage.removeItem('token')
     browserLocalStorage.removeItem('accountInfo')
+    browserLocalStorage.removeItem('setupTime')
   }
   return {
     type: UNAUTH_USER,
@@ -75,8 +76,10 @@ export function activateUser({ email, activeCode }, callback) {
         const parsedRes = JSON.parse(res.text);
         const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
         if(browserLocalStorage){
+          const now = new Date().getTime()
           browserLocalStorage.setItem('token', parsedRes.jwt)
           browserLocalStorage.setItem('accountInfo', JSON.stringify(_.omit(parsedRes, ['jwt'])))
+          browserLocalStorage.setItem('setupTime', now)
         }
         dispatch(authUser())
         callback()
@@ -97,8 +100,10 @@ export function signinUser({ email, password}, callback) {
         const parsedRes = JSON.parse(res.text);
         const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
         if(browserLocalStorage){
+          const now = new Date().getTime()
           browserLocalStorage.setItem('token', parsedRes.jwt)
           browserLocalStorage.setItem('accountInfo', JSON.stringify(_.omit(parsedRes, ['jwt'])))
+          browserLocalStorage.setItem('setupTime', now)
         }
         dispatch(authUser())
         callback()
