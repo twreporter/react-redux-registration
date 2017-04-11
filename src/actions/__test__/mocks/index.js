@@ -11,7 +11,7 @@ export const mockDefaultStates  = {
 }
 
 export const mockResponseSet = {
-  signup: {
+  signUp: {
     res: {
       ok: true
     }

@@ -14,11 +14,11 @@ npm i --save twreporter-registration
 * ActivePage
 * AuthenticationScreen
 * Features
-* SigninForm
-* SignupForm
+* SignInForm
+*
 
 ### Components
-* Signout
+* SignOut
 
 ### Reducers
 * authReducer
@@ -27,17 +27,17 @@ npm i --save twreporter-registration
 ## Usage js
 * import containers/components from twreporter-registration for react router of your peojct
 ```js
-import { SignupForm, AuthenticationScreen } from 'twreporter-registration'
+import { SignUpForm, AuthenticationScreen } from 'twreporter-registration'
 export default function (history = browserHistory) {
 return (
  <Router history={history} >
    <Route path="/" component={App}>
      <IndexRoute component={Home} />
-     <Route path="signup" component={SignupForm} />
-     <Route path="signin" component={SigninForm} />
+     <Route path="signup" component={SignUpForm} />
+     <Route path="signin" component={SignInForm} facebook={true} google={false}/>
      <Route path="activate" component={ActivePage} />
      <Route path="features" component={AuthenticationScreen(Features)} />
-     <Route path="signout" component={Signout} />
+     <Route path="signout" component={SignOut} />
    </Route>
  </Router>
 )

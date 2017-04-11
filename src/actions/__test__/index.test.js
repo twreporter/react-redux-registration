@@ -16,7 +16,7 @@ const API_URL = `${apiHost}:${apiPort}`
 const middlewares = [ thunk ]
 const mockStore = configureMockStore(middlewares)
 
-describe('Action Testing:SignUp, Activate, Signout, SignIn', function() {
+describe('Action Testing:signUp, Activate, Signout, SignIn', function() {
   before(() => {
     global.localStorage = (function() {
       let storage = {}
@@ -44,29 +44,29 @@ describe('Action Testing:SignUp, Activate, Signout, SignIn', function() {
     nock.cleanAll()
     localStorage.clear()
   })
-  context('Signup Success: ', function() {
+  context('signUp Success: ', function() {
     it('Actual actions should be same as expected actions', function() {
       const mockDefaultState = mockDefaultStates.initialState
       const mockAccount = mockParameterSet.mockAccount
       nock(API_URL)
-        .post(apiEndPoint.signup, {
+        .post(apiEndPoint.signUp, {
           email: mockAccount.email,
           password: mockAccount.password
         })
-        .reply(200, mockResponseSet.signup)
+        .reply(200, mockResponseSet.signUp)
       const store = mockStore(mockDefaultState)
-      return store.dispatch(actions.signupUser(mockAccount))
+      return store.dispatch(actions.signUpUser(mockAccount))
         .then(() => {
           const authReq = store.getActions()[0]
           const fetchMessage = store.getActions()[1]
           const expectedActions = [
             {
               type: types.AUTH_REQ,
-              payload: messagesSet.request.signup
+              payload: messagesSet.authProcess.signUp
             },
             {
               type: types.FETCH_MESSAGE,
-              payload: messagesSet.app.afterSignUp
+              payload: messagesSet.app.aftersignUp
             }
           ]
 
@@ -81,20 +81,20 @@ describe('Action Testing:SignUp, Activate, Signout, SignIn', function() {
       const mockDefaultState = mockDefaultStates.initialState
       const mockAccount = mockParameterSet.mockAccount
       nock(API_URL)
-        .post(apiEndPoint.signup, {
+        .post(apiEndPoint.signUp, {
           email: mockAccount.email,
           password: mockAccount.password
         })
         .replyWithError({ 'message': 'this is error message for testing', 'status': 404 })
       const store = mockStore(mockDefaultState)
-      return store.dispatch(actions.signupUser(mockAccount))
+      return store.dispatch(actions.signUpUser(mockAccount))
         .then(() => {
           const authReq = store.getActions()[0]
           const authError = store.getActions()[1]
           const expectedActions = [
             {
               type: types.AUTH_REQ,
-              payload: messagesSet.request.signup
+              payload: messagesSet.authProcess.signUp
             },
             {
               type: types.AUTH_ERROR,
@@ -125,7 +125,7 @@ describe('Action Testing:SignUp, Activate, Signout, SignIn', function() {
           const expectedActions = [
             {
               type: types.AUTH_REQ,
-              payload: messagesSet.request.activate
+              payload: messagesSet.authProcess.activate
             },
             {
               type: types.AUTH_USER
@@ -152,7 +152,7 @@ describe('Action Testing:SignUp, Activate, Signout, SignIn', function() {
           const expectedActions = [
             {
               type: types.AUTH_REQ,
-              payload: messagesSet.request.activate
+              payload: messagesSet.authProcess.activate
             },
             {
               type: types.AUTH_ERROR,
@@ -165,18 +165,18 @@ describe('Action Testing:SignUp, Activate, Signout, SignIn', function() {
     })
   })
 
-  context('Signin Success' , function() {
+  context('SignIn Success' , function() {
     it('Actual actions should be same as expected actions, Content in mockLocalStorage shoule be same as expected result', function() {
       const mockDefaultState = mockDefaultStates.initialState
       const mockAccount = mockParameterSet.mockAccount
       nock(API_URL)
-        .post(apiEndPoint.signin, {
+        .post(apiEndPoint.signIn, {
           email: mockAccount.email,
           password: mockAccount.password
         })
         .reply(200, mockResponseSet.authorizedAccount)
       const store = mockStore(mockDefaultState)
-      return store.dispatch(actions.signinUser(mockAccount, () => {
+      return store.dispatch(actions.signInUser(mockAccount, () => {
         expect({ ...JSON.parse(localStorage.getItem('accountInfo')), jwt: localStorage.getItem('token') }).to.deep.equal(mockResponseSet.authorizedAccount)
       }))
         .then(() => {
@@ -185,7 +185,7 @@ describe('Action Testing:SignUp, Activate, Signout, SignIn', function() {
           const expectedActions = [
             {
               type: types.AUTH_REQ,
-              payload: messagesSet.request.signin
+              payload: messagesSet.authProcess.signIn
             },
             {
               type: types.AUTH_USER,
@@ -203,20 +203,20 @@ describe('Action Testing:SignUp, Activate, Signout, SignIn', function() {
       const mockDefaultState = mockDefaultStates.initialState
       const mockAccount = mockParameterSet.mockAccount
       nock(API_URL)
-        .post(apiEndPoint.signin, {
+        .post(apiEndPoint.signIn, {
           email: mockAccount.email,
           password: mockAccount.password
         })
         .replyWithError({ 'message': 'this is error message for testing', 'status': 404 })
       const store = mockStore(mockDefaultState)
-      return store.dispatch(actions.signinUser(mockAccount, null))
+      return store.dispatch(actions.signInUser(mockAccount, null))
         .then(() => {
           const authReq = store.getActions()[0]
           const authError = store.getActions()[1]
           const expectedActions = [
             {
               type: types.AUTH_REQ,
-              payload: messagesSet.request.signin
+              payload: messagesSet.authProcess.signIn
             },
             {
               type: types.AUTH_ERROR,

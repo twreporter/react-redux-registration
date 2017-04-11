@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { signupUser } from '../actions'
+import { signUpUser } from '../actions'
 import { EMAIL, PASSWORD, CONFIRM } from './constants'
 
 const _ = {
   get,
 }
 
-class Signup extends React.Component {
+class SignUp extends React.Component {
   static fetchData() {
     return new Promise((resolve) => {
       resolve()
@@ -36,7 +36,7 @@ class Signup extends React.Component {
         })
         return false
     }
-    this.props.signup( this.state[EMAIL], this.state[PASSWORD] )
+    this.props.signUp( this.state[EMAIL], this.state[PASSWORD] )
   }
 
   generateInput() {
@@ -79,8 +79,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    signup: (email, password) => {dispatch(signupUser({ email, password }))}
+    signUp: (email, password) => {dispatch(signUpUser({ email, password }))}
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Signup)
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp)

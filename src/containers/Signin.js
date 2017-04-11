@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { signinUser, oAuthFacebook, oAuthGoogle } from '../actions'
+import { signInUser } from '../actions'
 import { EMAIL, PASSWORD } from './constants'
 import { apiHost, apiPort, apiEndPoint } from '../../config'
 
@@ -14,7 +14,7 @@ const _ = {
   get,
 }
 
-class Signin extends React.Component {
+class SignIn extends React.Component {
 
   static contextTypes = {
     router: React.PropTypes.object
@@ -38,13 +38,12 @@ class Signin extends React.Component {
       this.context.router.push('/features')
     }
     e.preventDefault()
-    this.props.signin( this.state[EMAIL], this.state[PASSWORD], redirect)
+    this.props.signIn( this.state[EMAIL], this.state[PASSWORD], redirect)
   }
 
   handleOnClick(e) {
     const target = e.target
     const name = target.name
-    // this.props.oAuthFB()
   }
 
   // PH == plaseholder
@@ -70,18 +69,30 @@ class Signin extends React.Component {
           { this.generateInput() }
           <button type="submit" value="Submit">Sign In</button>
         </form>
-        <button >
-          <a href={fbLoginUrl}>Facebook</a>
-        </button>
-        <button >
-          <a href={googleLoginUrl}>Google</a>
-        </button>
-        { this.props.messages ? <div>{this.props.messages}</div> : <div></div>}
-        { this.props.autherrorMessages ? <div>{this.props.autherrorMessages}</div> : <div></div>}
+        { this.props.route.facebook ?
+          <button >
+            <a href={fbLoginUrl}>Facebook</a>
+          </button>
+          : <span></span>
+        }
+        { this.props.route.google ?
+          <button >
+            <a href={googleLoginUrl}>Google</a>
+          </button>
+          : <span></span>
+        }
+        { this.props.messages ? <div>{this.props.messages}</div> : <span></span>}
+        { this.props.autherrorMessages ? <div>{this.props.autherrorMessages}</div> : <span></span>}
       </div>
     )
   }
 }
+
+SignIn.propTypes = {
+  signIn: React.PropTypes.func,
+  route: React.PropTypes.object
+};
+
 
 function mapStateToProps(state) {
   return {
@@ -92,10 +103,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    signin: (email, password, redirect) => {dispatch(signinUser({ email, password }, redirect))},
-    oAuthFB: () => {dispatch(oAuthFacebook())},
-    oAuthGoogle: () => {dispatch(oAuthGoogle())}
+    signIn: (email, password, redirect) => {dispatch(signInUser({ email, password }, redirect))},
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Signin)
+export default connect(mapStateToProps, mapDispatchToProps)(SignIn)
