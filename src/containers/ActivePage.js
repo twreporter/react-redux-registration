@@ -20,10 +20,12 @@ class ActivePage extends React.Component{
     const query = this.props.location.query
     const email = query.email
     const activeCode = query.token
-    const redirect = () => {
-      this.context.router.push('/features')
-    }
-    this.props.activate(email, activeCode, redirect)
+    this.props.activate(email, activeCode, this.props.apiUrl, this.props.activationPath)
+      .then((success) => {
+        this.context.router.push('/features')
+      }, (failure) => {
+        console.log('here should put err reaction for signin api request')
+      })
   }
   render() {
     return (
@@ -32,10 +34,17 @@ class ActivePage extends React.Component{
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapStateToProps(state) {
   return {
-    activate: (email, activeCode, redirect) => { dispatch(activateUser( { email, activeCode }, redirect)) }
+    apiUrl: _.get(state, 'authConfigure.apiUrl', ""),
+    activationPath: _.get(state, 'authConfigure.activate', "")
   }
 }
 
-export default connect(null, mapDispatchToProps)(ActivePage)
+function mapDispatchToProps(dispatch) {
+  return {
+    activate: (email, activeCode, apiUrl, activationPath) => { return dispatch(activateUser({ email, activeCode, apiUrl, activationPath })) }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ActivePage)

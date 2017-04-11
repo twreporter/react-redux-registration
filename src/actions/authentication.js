@@ -67,10 +67,10 @@ export function signUpUser({ email, password, apiUrl, signUpPath}) {
   }
 }
 
-export function activateUser({ email, activeCode }, callback) {
+export function activateUser({ email, activeCode, apiUrl, activationPath }) {
   return function(dispatch) {
     dispatch(authReq(messagesSet.authProcess.activationReq))
-    return request.get(`${API_URL}${apiEndPoint.activate}?email=${email}&token=${activeCode}`)
+    return request.get(`${apiUrl}${activationPath}?email=${email}&token=${activeCode}`)
       .then((res) => {
         const webStatus = res.status
         const parsedRes = JSON.parse(res.text);
@@ -82,7 +82,6 @@ export function activateUser({ email, activeCode }, callback) {
           browserLocalStorage.setItem('setupTime', now)
         }
         dispatch(authUser())
-        callback()
       }, (err) => {
         dispatch(authError(err))
       })

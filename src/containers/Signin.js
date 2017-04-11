@@ -38,10 +38,8 @@ class SignIn extends React.Component {
     this.props.signIn( this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signInPath )
       .then((success) => {
         this.context.router.push('/features')
-      })
-      .catch((err) => {
+      }, (failure) => {
         console.log('here should put err reaction for signin api request')
-        //pass
       })
   }
 
