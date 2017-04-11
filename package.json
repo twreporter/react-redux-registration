@@ -1,6 +1,6 @@
 {
   "name": "twreporter-registration",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "registration sginIn system ",
   "main": "index.js",
   "scripts": {
