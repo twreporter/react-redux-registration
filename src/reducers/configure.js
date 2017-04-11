@@ -1,6 +1,7 @@
 import { CONFIGURE } from '../actions/types'
 
 const initialState = {
+  apiUrl: '',
   signUp: '',
   signIn: '',
   activate: '',

@@ -45,11 +45,45 @@ return (
 ```
 * import reducers from twreporter-registration to root reducer
 ```js
-import { authReducer, oauthReducer } from 'twreporter-registration'
+import { authReducer, oauthReducer, configureReducer } from 'twreporter-registration'
 const rootReducer = combineReducers({
+   authConfigure: configureReducer,
    oauth: oauthReducer,
    auth: authReducer,
 })
+```
+
+* import actions from from package  
+We provide you a default structure of path of authentication api server. You only need to
+enter your paths into registrationConfigure obj which is presented at following example.
+```js
+// in your render file
+import { types, configureAction } from 'twreporter-registration'
+const registrationConfigure = {
+    apiUrl: 'http://testtest.twreporter.org/8080',
+    signUp: '/v1/signup',
+    signIn: '/v1/login',
+    activate: '/v1/activate',
+    bookmarkUpdate: '',
+    bookmarkDelete: '',
+    bookmarkGet: '',
+    ping: '',
+    oAuthProviders: {
+      google: '/v1/auth/google',
+      facebook: '/v1/auth/facebook'
+    }
+}
+// before render, you have to dispatch configureAction from our package
+// you have to choose either server side or client side rendering
+store.dispatch(configureAction(registrationConfigure)).then(
+  ReactDOM.render((
+    <Provider store={store}>
+      <DeviceProvider device={device}>
+        { createRoutes(history) }
+      </DeviceProvider>
+    </Provider>
+  ), document.getElementById('root'))
+)
 ```
 
 ## Development

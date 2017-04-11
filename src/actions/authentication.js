@@ -35,7 +35,7 @@ export function fetchMessages(message) {
 export function authUser() {
   return {
     type: AUTH_USER,
-    payload: messagesSet.authProcess.unauthUser
+    payload: messagesSet.authProcess.authUser
   }
 }
 
@@ -48,15 +48,15 @@ export function signOutUser() {
   }
   return {
     type: UNAUTH_USER,
-    payload: messagesSet.authProcess.authUser
+    payload: messagesSet.authProcess.unauthUser
   }
 }
 
 
-export function signUpUser({ email, password}) {
+export function signUpUser({ email, password, apiUrl, signUpPath}) {
   return function(dispatch) {
     dispatch(authReq(messagesSet.authProcess.signUpReq))
-    return request.post(`${API_URL}${apiEndPoint.signUp}`)
+    return request.post(`${apiUrl}${signUpPath}`)
       .set('Content-Type', 'application/json')
       .send({ email, password })
       .then((success) => {
@@ -89,10 +89,10 @@ export function activateUser({ email, activeCode }, callback) {
   }
 }
 
-export function signInUser({ email, password}, callback) {
+export function signInUser({ email, password, apiUrl, signInPath}) {
   return function(dispatch) {
     dispatch(authReq(messagesSet.authProcess.signInReq))
-    return request.post(`${API_URL}${apiEndPoint.signIn}`)
+    return request.post(`${apiUrl}${signInPath}`)
       .set('Content-Type', 'application/json')
       .send({ email, password })
       .then((res) => {
@@ -106,9 +106,10 @@ export function signInUser({ email, password}, callback) {
           browserLocalStorage.setItem('setupTime', now)
         }
         dispatch(authUser())
-        callback()
+        // return Promise.resolve()
       }, (err) => {
         dispatch(authError(err))
+        // return Promise.reject()
       })
   }
 }

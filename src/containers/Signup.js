@@ -36,7 +36,7 @@ class SignUp extends React.Component {
         })
         return false
     }
-    this.props.signUp( this.state[EMAIL], this.state[PASSWORD] )
+    this.props.signUp( this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signUpPath )
   }
 
   generateInput() {
@@ -73,13 +73,15 @@ class SignUp extends React.Component {
 function mapStateToProps(state) {
   return {
     autherrorMessages: _.get(state, 'auth.authError.errorMessages', ""),
-    messages: _.get(state, 'auth.messages', "")
+    messages: _.get(state, 'auth.messages', ""),
+    apiUrl: _.get(state, 'authConfigure.apiUrl', ""),
+    signUpPath: _.get(state, 'authConfigure.signUp', "")
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    signUp: (email, password) => {dispatch(signUpUser({ email, password }))}
+    signUp: (email, password, apiUrl, signUpPath) => {dispatch(signUpUser({ email, password, apiUrl, signUpPath }))}
   }
 }
 

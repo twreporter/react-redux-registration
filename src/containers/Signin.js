@@ -5,10 +5,10 @@ import { signInUser } from '../actions'
 import { EMAIL, PASSWORD } from './constants'
 import { apiHost, apiPort, apiEndPoint } from '../../config'
 
-const API_URL = `${apiHost}:${apiPort}`
-const query = 'location=http://testtest.twreporter.org:3000&domain=twreporter.org'
-const fbLoginUrl = `${API_URL}${apiEndPoint.facebook}?${query}`
-const googleLoginUrl = `${API_URL}${apiEndPoint.google}?${query}`
+// const API_URL = `${apiHost}:${apiPort}`
+// const query = 'location=http://testtest.twreporter.org:3000&domain=twreporter.org'
+// const fbLoginUrl = `${API_URL}${apiEndPoint.facebook}?${query}`
+// const googleLoginUrl = `${API_URL}${apiEndPoint.google}?${query}`
 
 const _ = {
   get,
@@ -34,11 +34,15 @@ class SignIn extends React.Component {
   }
 
   handleSubmit(e) {
-    const redirect = () => {
-      this.context.router.push('/features')
-    }
     e.preventDefault()
-    this.props.signIn( this.state[EMAIL], this.state[PASSWORD], redirect)
+    this.props.signIn( this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signInPath )
+      .then((success) => {
+        this.context.router.push('/features')
+      })
+      .catch((err) => {
+        console.log('here should put err reaction for signin api request')
+        //pass
+      })
   }
 
   handleOnClick(e) {
@@ -63,6 +67,7 @@ class SignIn extends React.Component {
   }
 
   render() {
+    const { apiUrl, facebookPath, googlePath } = this.props
     return (
       <div>
         <form onSubmit={(e) => {this.handleSubmit(e)}}>
@@ -71,13 +76,13 @@ class SignIn extends React.Component {
         </form>
         { this.props.route.facebook ?
           <button >
-            <a href={fbLoginUrl}>Facebook</a>
+            <a href={`${apiUrl}${facebookPath}`}>Facebook</a>
           </button>
           : <span></span>
         }
         { this.props.route.google ?
           <button >
-            <a href={googleLoginUrl}>Google</a>
+            <a href={`${apiUrl}${googlePath}`}>Google</a>
           </button>
           : <span></span>
         }
@@ -97,13 +102,17 @@ SignIn.propTypes = {
 function mapStateToProps(state) {
   return {
     autherrorMessages: _.get(state, 'auth.authError.errorMessages', ""),
-    messages: _.get(state, 'auth.messages', "")
+    messages: _.get(state, 'auth.messages', ""),
+    apiUrl: _.get(state, 'authConfigure.apiUrl', ""),
+    signInPath: _.get(state, 'authConfigure.signIn', ""),
+    facebookPath: _.get(state, 'authConfigure.oAuthProviders.facebook', ""),
+    googlePath: _.get(state, 'authConfigure.oAuthProviders.google', "")
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    signIn: (email, password, redirect) => {dispatch(signInUser({ email, password }, redirect))},
+    signIn: (email, password, apiUrl, signInPath) => { return dispatch(signInUser({ email, password, apiUrl, signInPath })) },
   }
 }
 
