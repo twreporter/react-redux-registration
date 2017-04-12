@@ -3,12 +3,6 @@ import { connect } from 'react-redux'
 import { get } from 'lodash'
 import { signInUser } from '../actions'
 import { EMAIL, PASSWORD } from './constants'
-import { apiHost, apiPort, apiEndPoint } from '../../config'
-
-// const API_URL = `${apiHost}:${apiPort}`
-// const query = 'location=http://testtest.twreporter.org:3000&domain=twreporter.org'
-// const fbLoginUrl = `${API_URL}${apiEndPoint.facebook}?${query}`
-// const googleLoginUrl = `${API_URL}${apiEndPoint.google}?${query}`
 
 const _ = {
   get,
@@ -36,10 +30,11 @@ class SignIn extends React.Component {
   handleSubmit(e) {
     e.preventDefault()
     this.props.signIn( this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signInPath )
-      .then((success) => {
+      .then(() => {
         this.context.router.push('/features')
-      }, (failure) => {
-        console.log('here should put err reaction for signin api request')
+      })
+      .catch(() => {
+        console.log('Response for erro. Not decide yet')
       })
   }
 
@@ -96,7 +91,6 @@ SignIn.propTypes = {
   route: React.PropTypes.object
 };
 
-
 function mapStateToProps(state) {
   return {
     autherrorMessages: _.get(state, 'auth.authError.errorMessages', ""),
@@ -108,10 +102,4 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    signIn: (email, password, apiUrl, signInPath) => { return dispatch(signInUser({ email, password, apiUrl, signInPath })) },
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignIn)
+export default connect(mapStateToProps, {signIn: signInUser} )(SignIn)

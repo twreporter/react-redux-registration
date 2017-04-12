@@ -79,7 +79,7 @@ gulp.task('watch', function() {
   gulp.watch(paths.containers, ['containers']);
   gulp.watch(paths.reducers, ['reducers']);
   gulp.watch(paths.actions, ['actions']);
-  gulp.watch(paths.actions, ['utils']);
+  gulp.watch(paths.utils, ['utils']);
 });
 
 gulp.task('default', ['watch', 'index', 'components', 'containers', 'reducers', 'actions', 'utils']);

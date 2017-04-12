@@ -1,24 +1,34 @@
-function localStorageExist(localStorage) {
-  return typeof localStorage === 'undefined' ? false : true;
+function localStorageExist(callback) {
+  const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
+  callback(browserLocalStorage)
 }
 
-export function setupToken() {
-  // ls == localStorage
-  const ls = arguments[0]
-  if(localStorageExist(ls)){
-    for(let i=1 ; i<arguments.length ; i++){
-      ls.setItem(arguments[i].key, arguments[i].value)
+/**
+* @param {object} setting - inside obj should be key value pair for localStorage
+*/
+
+export function setupToken(setting) {
+  localStorageExist((ls) => {
+    if(ls) {
+      for(let prop in setting) {
+        ls.setItem(prop, setting[prop])
+      }
     }
-  }
+  })
 }
 
-export function removeToken() {
-  const ls = arguments[0]
-  if(localStorageExist(ls)){
-    for(let i=1 ; i<arguments.length ; i++){
-      ls.removeItem(arguments[i].key)
+/**
+* @param {array} setting - contain string key
+*/
+
+export function removeToken(setting) {
+  localStorageExist((ls) => {
+    if(ls) {
+      for(let prop of setting) {
+        ls.removeItem(prop)
+      }
     }
-  }
+  })
 }
 
 export function tokenExpirationChecker(localStorage, days) {

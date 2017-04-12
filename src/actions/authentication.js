@@ -1,15 +1,12 @@
 import request from 'superagent'
 import { AUTH_USER, UNAUTH_USER, AUTH_ERROR, FETCH_MESSAGE, AUTH_REQ } from './types'
 import { omit } from 'lodash'
-import { apiHost, apiPort, apiEndPoint } from '../../config'
 import { messagesSet } from './constants'
+import { setupToken, removeToken } from '../utils/tokenManager'
 
 const _ = {
   omit
 }
-
-const API_URL = `${apiHost}:${apiPort}`
-// const O_AUTH_API_URL = 'http://testtest.twreporter.org:8080'
 
 export function authError({status, message}) {
   return {
@@ -40,12 +37,7 @@ export function authUser() {
 }
 
 export function signOutUser() {
-  const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
-  if(browserLocalStorage){
-    browserLocalStorage.removeItem('token')
-    browserLocalStorage.removeItem('accountInfo')
-    browserLocalStorage.removeItem('setupTime')
-  }
+  removeToken(['token', 'accountInfo', 'setupTime'])
   return {
     type: UNAUTH_USER,
     payload: messagesSet.authProcess.unauthUser
@@ -53,7 +45,7 @@ export function signOutUser() {
 }
 
 
-export function signUpUser({ email, password, apiUrl, signUpPath}) {
+export function signUpUser(email, password, apiUrl, signUpPath) {
   return function(dispatch) {
     dispatch(authReq(messagesSet.authProcess.signUpReq))
     return request.post(`${apiUrl}${signUpPath}`)
@@ -67,48 +59,52 @@ export function signUpUser({ email, password, apiUrl, signUpPath}) {
   }
 }
 
-export function activateUser({ email, activeCode, apiUrl, activationPath }) {
+export function activateUser(email, activeCode, apiUrl, activationPath) {
   return function(dispatch) {
     dispatch(authReq(messagesSet.authProcess.activationReq))
-    return request.get(`${apiUrl}${activationPath}?email=${email}&token=${activeCode}`)
-      .then((res) => {
-        const webStatus = res.status
-        const parsedRes = JSON.parse(res.text);
-        const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
-        if(browserLocalStorage){
+    return new Promise((resolve, reject) => {
+      request.get(`${apiUrl}${activationPath}?email=${email}&token=${activeCode}`)
+        .then((res) => {
+          const webStatus = res.status
+          const parsedRes = JSON.parse(res.text);
           const now = new Date().getTime()
-          browserLocalStorage.setItem('token', parsedRes.jwt)
-          browserLocalStorage.setItem('accountInfo', JSON.stringify(_.omit(parsedRes, ['jwt'])))
-          browserLocalStorage.setItem('setupTime', now)
-        }
-        dispatch(authUser())
-      }, (err) => {
-        dispatch(authError(err))
-      })
+          setupToken({
+            'token': parsedRes.jwt,
+            'accountInfo': JSON.stringify(_.omit(parsedRes, ['jwt'])),
+            'setupTime': now
+          })
+          dispatch(authUser())
+          resolve()
+        }, (err) => {
+          dispatch(authError(err))
+          reject()
+        })
+    })
   }
 }
 
-export function signInUser({ email, password, apiUrl, signInPath}) {
+export function signInUser(email, password, apiUrl, signInPath) {
   return function(dispatch) {
     dispatch(authReq(messagesSet.authProcess.signInReq))
-    return request.post(`${apiUrl}${signInPath}`)
-      .set('Content-Type', 'application/json')
-      .send({ email, password })
-      .then((res) => {
-        const webStatus = res.status
-        const parsedRes = JSON.parse(res.text);
-        const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
-        if(browserLocalStorage){
+    return new Promise((resolve, reject) => {
+      request.post(`${apiUrl}${signInPath}`)
+        .set('Content-Type', 'application/json')
+        .send({ email, password })
+        .then((res) => {
+          const webStatus = res.status
+          const parsedRes = JSON.parse(res.text);
           const now = new Date().getTime()
-          browserLocalStorage.setItem('token', parsedRes.jwt)
-          browserLocalStorage.setItem('accountInfo', JSON.stringify(_.omit(parsedRes, ['jwt'])))
-          browserLocalStorage.setItem('setupTime', now)
-        }
-        dispatch(authUser())
-        // return Promise.resolve()
-      }, (err) => {
-        dispatch(authError(err))
-        // return Promise.reject()
-      })
+          setupToken({
+            'token': parsedRes.jwt,
+            'accountInfo': JSON.stringify(_.omit(parsedRes, ['jwt'])),
+            'setupTime': now
+          })
+          dispatch(authUser())
+          resolve()
+        }, (err) => {
+          dispatch(authError(err))
+          reject()
+        })
+    })
   }
 }

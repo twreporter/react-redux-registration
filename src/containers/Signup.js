@@ -79,10 +79,4 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    signUp: (email, password, apiUrl, signUpPath) => {dispatch(signUpUser({ email, password, apiUrl, signUpPath }))}
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignUp)
+export default connect(mapStateToProps, { signUp: signUpUser })(SignUp)

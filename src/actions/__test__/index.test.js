@@ -4,7 +4,7 @@ import * as types from '../types'
 import * as actions from '../index'
 import { messagesSet } from '../constants'
 import { mockDefaultStates, mockResponseSet, mockParameterSet } from './mocks'
-import { apiHost, apiPort, apiEndPoint } from '../../../config'
+import { apiHost, apiPort, apiEndPoint } from './mocks/config'
 
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'

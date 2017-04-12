@@ -91,5 +91,5 @@ store.dispatch(configureAction(registrationConfigure)).then(
 npm run dev
 ```
 * advice for developer/programmer:
-You can program in ES6/7 and only need to edit files in **src** directory.
+You can program in es2015/es2017 and only need to edit files in **src** directory.
 All files will be transpiled through babel-preset-es2017 and transfered to **lib** directory.

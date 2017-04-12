@@ -21,10 +21,11 @@ class ActivePage extends React.Component{
     const email = query.email
     const activeCode = query.token
     this.props.activate(email, activeCode, this.props.apiUrl, this.props.activationPath)
-      .then((success) => {
+      .then(() => {
         this.context.router.push('/features')
-      }, (failure) => {
-        console.log('here should put err reaction for signin api request')
+      })
+      .catch(() => {
+        console.log('Response for erro. Not decide yet')
       })
   }
   render() {
@@ -41,10 +42,4 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    activate: (email, activeCode, apiUrl, activationPath) => { return dispatch(activateUser({ email, activeCode, apiUrl, activationPath })) }
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ActivePage)
+export default connect(mapStateToProps, { activate: activateUser })(ActivePage)
