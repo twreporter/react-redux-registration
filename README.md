@@ -36,7 +36,7 @@ return (
      <Route path="signup" component={SignUpForm} />
      <Route path="signin" component={SignInForm} facebook={true} google={false}/>
      <Route path="activate" component={ActivePage} />
-     <Route path="features" component={AuthenticationScreen(Features)} />
+     <Route path="features" component={AuthenticationScreen(Features)} redirectPath={'/signin'} />
      <Route path="signout" component={SignOut} />
    </Route>
  </Router>

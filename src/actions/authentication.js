@@ -29,10 +29,10 @@ export function fetchMessages(message) {
   }
 }
 
-export function authUser() {
+export function authUser(authType, token) {
   return {
     type: AUTH_USER,
-    payload: messagesSet.authProcess.authUser
+    payload: { authProcess: messagesSet.authProcess.authUser, authType, token }
   }
 }
 
@@ -43,7 +43,6 @@ export function signOutUser() {
     payload: messagesSet.authProcess.unauthUser
   }
 }
-
 
 export function signUpUser(email, password, apiUrl, signUpPath) {
   return function(dispatch) {
@@ -73,7 +72,7 @@ export function activateUser(email, activeCode, apiUrl, activationPath) {
             'accountInfo': JSON.stringify(_.omit(parsedRes, ['jwt'])),
             'setupTime': now
           })
-          dispatch(authUser())
+          dispatch(authUser('account signUp/activate', ''))
           resolve()
         }, (err) => {
           dispatch(authError(err))
@@ -99,7 +98,7 @@ export function signInUser(email, password, apiUrl, signInPath) {
             'accountInfo': JSON.stringify(_.omit(parsedRes, ['jwt'])),
             'setupTime': now
           })
-          dispatch(authUser())
+          dispatch(authUser('account signIn', ''))
           resolve()
         }, (err) => {
           dispatch(authError(err))
