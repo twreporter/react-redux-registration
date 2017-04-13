@@ -1,0 +1,50 @@
+{
+  "name": "twreporter-registration",
+  "version": "1.1.4",
+  "description": "registration sginIn system ",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha $(find src -name '*.test.js') --compilers js:babel-core/register",
+    "gulp": "gulp",
+    "dev": "npm run gulp"
+  },
+  "keywords": [
+    "registration",
+    "signIn",
+    "signUp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twreporter/react-redux-registration.git"
+  },
+  "author": "hanyulo",
+  "license": "ISC",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.3.21",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-es2017": "^6.22.0",
+    "babel-preset-react": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "concurrently": "^3.4.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-rename": "^1.2.2"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.23.0",
+    "chai": "^3.3.0",
+    "lodash": "^4.17.4",
+    "mocha": "^3.2.0",
+    "nock": "^2.17.0",
+    "react": "^15.4.1",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.5.1",
+    "redux": "^3.5.2",
+    "redux-mock-store": "^1.0.2",
+    "redux-thunk": "^2.2.0",
+    "superagent": "^3.5.1"
+  }
+}
