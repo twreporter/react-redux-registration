@@ -1,17 +1,24 @@
 function localStorageExist(callback) {
-  const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage;
-  callback(browserLocalStorage)
+  const browserLocalStorage = (typeof localStorage === 'undefined') ? null : localStorage
+  if (browserLocalStorage) {
+    return callback(browserLocalStorage)
+  }
+  return null
 }
 
 /**
 * @param {object} setting - inside obj should be key value pair for localStorage
 */
 
-export function setupToken(setting) {
+export function setupTokenInLocalStorage(setting) {
   localStorageExist((ls) => {
-    if(ls) {
-      for(let prop in setting) {
-        ls.setItem(prop, setting[prop])
+    if (ls) {
+      const now = new Date().getTime()
+      ls.setItem('setupTime', now)
+      for (const key in setting) {
+        if (Object.prototype.hasOwnProperty.call(setting, key)) {
+          ls.setItem(key, setting[key])
+        }
       }
     }
   })
@@ -21,22 +28,26 @@ export function setupToken(setting) {
 * @param {array} setting - contain string key
 */
 
-export function removeToken(setting) {
+export function removeToken() {
   localStorageExist((ls) => {
-    if(ls) {
-      for(let prop of setting) {
-        ls.removeItem(prop)
-      }
+    if (ls) {
+      ls.clear()
     }
   })
 }
 
-export function tokenExpirationChecker(localStorage, days) {
-  if(localStorage.getItem('setupTime')) {
-    const setupTime = localStorage.getItem('setupTime')
-    const now = new Date().getTime()
-    if(now-setupTime > days*24*60*60*1000) {
-      localStorage.clear()
+export function tokenExpirationChecker(days) {
+  return localStorageExist((ls) => {
+    const setupTime = ls.getItem('setupTime')
+    const token = ls.getItem('jwt')
+    if (setupTime && token) {
+      const now = new Date().getTime()
+      if (now - setupTime > days * 24 * 60 * 60 * 1000) {
+        ls.clear()
+        return true
+      }
+      return false
     }
-  }
+    return true
+  })
 }

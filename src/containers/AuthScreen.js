@@ -1,5 +1,5 @@
+import PropTypes from 'prop-types'
 import React from 'react'
-import { browserHistory } from 'react-router'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 
@@ -9,32 +9,41 @@ const _ = {
 
 export default (ComposedComponent) => {
   class AuthenticationScreen extends React.Component {
-
     componentWillMount() {
-      if(!this.props.authenticated) {
+      if (!this.props.authenticated) {
         this.context.router.push(this.props.route.redirectPath)
       }
     }
 
     componentWillUpdate() {
-      if(!this.props.authenticated) {
+      if (!this.props.authenticated) {
         this.context.router.push(this.props.route.redirectPath)
       }
     }
 
-    render () {
-      return <ComposedComponent  {...this.props}/>
+    render() {
+      return <ComposedComponent {...this.props} />
     }
   }
 
   function mapStateToProps(state) {
     return {
-      authenticated: _.get(state, 'auth.authenticated', false)
+      authenticated: _.get(state, 'auth.authenticated', false),
     }
   }
 
   AuthenticationScreen.contextTypes = {
-    router: React.PropTypes.object
+    router: PropTypes.object,
+  }
+
+  AuthenticationScreen.defaultProps = {
+    authenticated: false,
+    route: {},
+  }
+
+  AuthenticationScreen.propTypes = {
+    authenticated: PropTypes.bool,
+    route: PropTypes.object,
   }
 
   return connect(mapStateToProps)(AuthenticationScreen)

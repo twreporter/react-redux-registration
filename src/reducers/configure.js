@@ -1,5 +1,18 @@
 import { CONFIGURE } from '../actions/types'
 
+export default function (initialState) {
+  return (state = initialState, action) => {
+    switch (action.type) {
+      case CONFIGURE:
+        return { ...state, ...action.payload }
+      default:
+        return state
+    }
+  }
+}
+
+// initailState Example
+/*
 const initialState = {
   apiUrl: '',
   signUp: '',
@@ -14,12 +27,4 @@ const initialState = {
     facebook: ''
   }
 }
-
-export default function(state = initialState, action) {
-  switch(action.type) {
-    case CONFIGURE:
-      return { ...state, ...action.payload }
-    default:
-      return state
-  }
-}
+*/
