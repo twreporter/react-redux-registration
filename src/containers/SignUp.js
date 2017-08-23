@@ -7,7 +7,8 @@ import { NormalButton } from '../components/form-buttons'
 import { signUpUser, resetAuthError } from '../actions'
 import { SignUpForm, font } from '../styles/common-variables'
 // import { withRouter } from 'react-router'
-import { EMAIL, PASSWORD, CONFIRM, EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INCONSISTENT_PASSWORD } from '../constants/SignUp'
+import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INCONSISTENT_PASSWORD } from '../constants/string'
+import { EMAIL, PASSWORD, CONFIRM } from '../constants/form'
 
 const _ = {
   get,

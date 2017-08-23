@@ -16,8 +16,6 @@ const GoogleButton = OAuthButoon.extend`
 
 const Google = (props) => {
   const { apiUrl, googlePath, location, domain } = props
-  console.log('domain: ', domain)
-  console.log('location: ', location)
   return (
     <GoogleButton
       href={`${apiUrl}${googlePath}?location=${location}&domain=${domain}`}

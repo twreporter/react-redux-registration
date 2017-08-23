@@ -7,7 +7,8 @@ import { Link } from 'react-router'
 import { NormalButton } from '../components/form-buttons'
 import { signInUser, resetAuthError } from '../actions'
 import { SignInForm, font } from '../styles/common-variables'
-import { EMAIL, PASSWORD, ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, SIGN_UP } from '../constants/SignIn'
+import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, SIGN_UP } from '../constants/string'
+import { EMAIL, PASSWORD } from '../constants/form'
 
 const _ = {
   get,
