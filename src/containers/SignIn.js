@@ -148,7 +148,7 @@ class SignIn extends React.Component {
   }
 
   render() {
-    const { title, NextLink, account, defaultStyle } = this.props
+    const { title, NextLink, defaultStyle } = this.props
 
     const signUpArea = (() => {
       // in next project, developer has to pass Link from 'next/link' to props.NextLink
@@ -171,19 +171,15 @@ class SignIn extends React.Component {
     const signInArea = (() => {
       return (
         <SigInSubFrame defaultStyle={defaultStyle}>
-          {
-            account ?
-              <div>
-                { this.generateInput() }
-                <SignInButton
-                  onClick={this.handleOnClick}
-                  type="button"
-                >
-                  {`${SIGN_IN}`}
-                </SignInButton>
-              </div>
-              : <span />
-          }
+          <div>
+            { this.generateInput() }
+            <SignInButton
+              onClick={this.handleOnClick}
+              type="button"
+            >
+              {`${SIGN_IN}`}
+            </SignInButton>
+          </div>
           {this.props.children}
         </SigInSubFrame>
       )
@@ -194,7 +190,7 @@ class SignIn extends React.Component {
         <div>
           <Title>{`${title}`}</Title>
           {signInArea}
-          { account ? <SignUpSubFrame defaultStyle={defaultStyle}>{signUpArea}</SignUpSubFrame> : <span /> }
+          <SignUpSubFrame defaultStyle={defaultStyle}>{signUpArea}</SignUpSubFrame>
           { this.state.authErrorMessage ? <div>{this.state.authErrorMessage}</div> : <span /> }
         </div>
       )
@@ -231,7 +227,6 @@ SignIn.propTypes = {
   title: PropTypes.string,
   historyManager: PropTypes.object,
   signInRedirectPath: PropTypes.string,
-  account: PropTypes.bool.isRequired,
   defaultStyle: PropTypes.bool.isRequired,
   NextLink: PropTypes.element,
   children: React.PropTypes.oneOfType([

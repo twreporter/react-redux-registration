@@ -101,11 +101,6 @@ const SignIn = (props) => (
     title={'title'}
     historyManager={browserHistory}
     signInRedirectPath = {'/'}
-    location={'http://testtest.twreporter.org:3000'}
-    domain={'twreporter.org'}
-    account={true}
-    google={true}
-    facebook={true}
     defaultStyle={true}
     {...props}
   >
@@ -161,7 +156,9 @@ const registrationInitialState = {
   oAuthProviders: {
     google: '',
     facebook: ''
-  }
+  },
+  location: '',
+  domain: '',
 }
 const ConfigureReducer = configureReducer(registrationInitialState)
 
