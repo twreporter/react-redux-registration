@@ -1,7 +1,8 @@
 import ActivePage from './containers/ActivePage'
 import AuthenticationScreen from './containers/AuthScreen'
-import SignInForm from './containers/SignIn'
-import SignUpForm from './containers/SignUp'
+import NextSignInForm from './containers/sign-in-next'
+import SignInForm from './containers/sign-in-react'
+import SignUpForm from './containers/sign-up'
 import FacebookButton from './containers/facebook-button'
 import GoogleButton from './containers/google-button'
 import authReducer from './reducers/authReducer'
@@ -14,6 +15,7 @@ import { setupTokenInLocalStorage, tokenExpirationChecker } from './utils/tokenM
 export {
   ActivePage,
   AuthenticationScreen,
+  NextSignInForm,
   SignInForm,
   SignUpForm,
   FacebookButton,

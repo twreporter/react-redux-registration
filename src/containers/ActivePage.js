@@ -43,10 +43,6 @@ class ActivePage extends React.PureComponent {
   }
 }
 
-// ActivePage.contextTypes = {
-//   router: PropTypes.object,
-// }
-
 ActivePage.defaultProps = {
   location: {},
   browserHistory: {},

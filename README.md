@@ -8,7 +8,7 @@
   3. react-router
   4. express server
 
-* Bonus: The package work with [next.js](https://github.com/zeit/next.js)
+* Note(deprecated): The package work with [next.js](https://github.com/zeit/next.js)
 
 
 ## Installation
@@ -93,13 +93,11 @@ export default connect()(SignUp)
 ```js
 import React from 'react'
 import { connect } from 'react-redux'
-import { browserHistory } from 'react-router'
 import { SignInForm, FacebookButton, GoogleButton } from 'twreporter-registration'
 
 const SignIn = (props) => (
   <SignInForm
     title={'title'}
-    historyManager={browserHistory}
     signInRedirectPath = {'/'}
     defaultStyle={true}
     {...props}
@@ -281,3 +279,6 @@ CUSTOMER_FOLDER=/Users/hanReporter/Documents/twReporter_frontEnd/twreporter-reac
 * advice for developer/programmer:
 You can program in es2015 + es2017 and only need to edit files in **src** directory.
 All files will be transpiled through babel-preset-es2017 and transferred to **lib** directory.
+
+* TO DO
+create next version of active page

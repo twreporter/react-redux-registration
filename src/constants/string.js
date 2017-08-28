@@ -15,3 +15,5 @@ export const SIGN_UP = {
 }
 export const ACCOUNT_LABEL = '帳號'
 export const PASSWORD_LABEL = '密碼'
+// Both
+export const INVALID_EMAIL = '電子信箱格式錯誤，請重新輸入'

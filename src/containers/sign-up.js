@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
+import validateEmail from '../utils/validateEmail'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import { NormalButton } from '../components/form-buttons'
 import { signUpUser, resetAuthError } from '../actions'
 import { SignUpForm, font } from '../styles/common-variables'
 // import { withRouter } from 'react-router'
-import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INCONSISTENT_PASSWORD } from '../constants/string'
+import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INCONSISTENT_PASSWORD, INVALID_EMAIL } from '../constants/string'
 import { EMAIL, PASSWORD, CONFIRM } from '../constants/form'
 
 const _ = {
@@ -95,9 +96,16 @@ class SignUp extends React.Component {
 
   _handleOnClick() {
     // check validation
+    let validationError
     if (this.state[PASSWORD] !== this.state[CONFIRM]) {
+      validationError = INCONSISTENT_PASSWORD
+    }
+    if (!validateEmail(this.state[EMAIL])) {
+      validationError = INVALID_EMAIL
+    }
+    if (validationError) {
       this.setState({
-        validationError: INCONSISTENT_PASSWORD,
+        validationError,
         authErrorMessage: '',
       })
       // prevent program run to following statements

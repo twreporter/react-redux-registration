@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
+import validateEmail from '../utils/validateEmail'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
-import { Link } from 'react-router'
 import { NormalButton } from '../components/form-buttons'
 import { signInUser, resetAuthError } from '../actions'
 import { SignInForm, font } from '../styles/common-variables'
-import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, SIGN_UP } from '../constants/string'
+import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, INVALID_EMAIL } from '../constants/string'
 import { EMAIL, PASSWORD } from '../constants/form'
 
 const _ = {
@@ -65,20 +65,14 @@ const Input = styled.input`
 
 const SignInButton = NormalButton.extend``
 
-const LinkStyle = styled.span`
-  color: #0366D6;
-  opacity: 0.7;
-  &:hover {
-    cursor: pointer;
-  }
-`
-class SignIn extends React.Component {
+class SignInPrototype extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       [EMAIL]: '',
       [PASSWORD]: '',
       authErrorMessage: '',
+      validationError: '',
     }
     this.handleOnClick = this._handleOnClick.bind(this)
     this.handleOnKeyDown = this._handleOnKeyDown.bind(this)
@@ -110,18 +104,28 @@ class SignIn extends React.Component {
     })
   }
 
-  // historyManager = Router of next or browserHistory of react-router
   _handleOnClick() {
-    const { signIn, historyManager, signInRedirectPath } = this.props
-    signIn(this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signInPath)
-      .then(() => {
-        historyManager.push(signInRedirectPath)
+    const { signIn, router, signInRedirectPath } = this.props
+    if (!validateEmail(this.state[EMAIL])) {
+      this.setState({
+        validationError: INVALID_EMAIL,
       })
-      .catch((errorInfo) => {
-        this.setState({
-          authErrorMessage: _.get(errorInfo, 'message', 'default error!'),
+      // prevent program run to following statements
+      return
+    }
+    this.setState({
+      validationError: '',
+    }, () => {
+      signIn(this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signInPath)
+        .then(() => {
+          router.push(signInRedirectPath)
         })
-      })
+        .catch((errorInfo) => {
+          this.setState({
+            authErrorMessage: _.get(errorInfo, 'message', 'default error!'),
+          })
+        })
+    })
   }
 
   _handleOnKeyDown(e) {
@@ -148,26 +152,8 @@ class SignIn extends React.Component {
   }
 
   render() {
-    const { title, NextLink, defaultStyle } = this.props
-
-    const signUpArea = (() => {
-      // in next project, developer has to pass Link from 'next/link' to props.NextLink
-      if (NextLink) {
-        return (
-          <div>
-            <span>{`${SIGN_UP.plainText}`}&nbsp;</span>
-            <NextLink href="/signup"><a>{`${SIGN_UP.linkText}`}</a></NextLink>
-          </div>
-        )
-      }
-      return (
-        <div>
-          <span>{`${SIGN_UP.plainText}`}&nbsp;</span>
-          <Link to="/signup"><LinkStyle>{`${SIGN_UP.linkText}`}</LinkStyle></Link>
-        </div>
-      )
-    })()
-
+    console.log('this.state.validationError: ', this.state.validationError)
+    const { title, defaultStyle } = this.props
     const signInArea = (() => {
       return (
         <SigInSubFrame defaultStyle={defaultStyle}>
@@ -190,8 +176,9 @@ class SignIn extends React.Component {
         <div>
           <Title>{`${title}`}</Title>
           {signInArea}
-          <SignUpSubFrame defaultStyle={defaultStyle}>{signUpArea}</SignUpSubFrame>
+          <SignUpSubFrame defaultStyle={defaultStyle}>{this.props.signUpArea}</SignUpSubFrame>
           { this.state.authErrorMessage ? <div>{this.state.authErrorMessage}</div> : <span /> }
+          { this.state.validationError ? <div>{this.state.validationError}</div> : <span /> }
         </div>
       )
     })()
@@ -209,26 +196,24 @@ class SignIn extends React.Component {
   }
 }
 
-SignIn.defaultProps = {
+SignInPrototype.defaultProps = {
   apiUrl: '',
   signIn: () => {},
   signInPath: '',
   title: '',
-  historyManager: {},
   signInRedirectPath: '',
-  NextLink: undefined,
   children: null,
 }
 
-SignIn.propTypes = {
+SignInPrototype.propTypes = {
   apiUrl: PropTypes.string,
   signIn: PropTypes.func,
   signInPath: PropTypes.string,
   title: PropTypes.string,
-  historyManager: PropTypes.object,
+  router: PropTypes.object.isRequired,
   signInRedirectPath: PropTypes.string,
+  signUpArea: PropTypes.element.isRequired,
   defaultStyle: PropTypes.bool.isRequired,
-  NextLink: PropTypes.element,
   children: React.PropTypes.oneOfType([
     React.PropTypes.arrayOf(React.PropTypes.node),
     React.PropTypes.node,
@@ -242,4 +227,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, { signIn: signInUser, resetAuthError })(SignIn)
+export default connect(mapStateToProps, { signIn: signInUser, resetAuthError })(SignInPrototype)
