@@ -4,9 +4,13 @@ export const messagesSet = {
     activationReq: 'Active Request',
     signInReq: 'Sign In Request',
     authUser: 'User is authenticated successfully',
-    unauthUser: 'User signed out'
+    unauthUser: 'User signed out',
   },
-  app: {
-    afterSignUp: 'You will receive an E-mail. Please check your mail box.'
-  }
+  authError: {
+    tokenMsg: 'the token has expired or unvalid token',
+  },
+  token: {
+    valid: 'Valid Token',
+    invalid: 'Expired or Invlaid Token',
+  },
 }

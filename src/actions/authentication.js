@@ -1,81 +1,108 @@
-import request from 'superagent'
-import { AUTH_USER, UNAUTH_USER, AUTH_ERROR, FETCH_MESSAGE, AUTH_REQ } from './types'
-import { omit } from 'lodash'
-import { messagesSet } from './constants'
-import { setupToken, removeToken } from '../utils/tokenManager'
+import axios from 'axios'
+import get from 'lodash/get'
+import { AUTH_USER, UNAUTH_USER, AUTH_ERROR, AUTH_REQ, DELETE_AUTHINFO, WRITE_TOKEN_STATUS, RESET_AUTH_ERROR } from './types'
+import { messagesSet } from '../constants/messageSet'
+import { setupTokenInLocalStorage, removeToken, tokenExpirationChecker } from '../utils/tokenManager'
 
 const _ = {
-  omit
+  get,
 }
 
-export function authError({status, message}) {
+const getAxiosInstance = () => {
+  return axios.create({
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+
+export function resetAuthError() {
+  return {
+    type: RESET_AUTH_ERROR,
+  }
+}
+
+export function deletAuthInfo() {
+  return {
+    type: DELETE_AUTHINFO,
+  }
+}
+
+export function authError({ status, message }) {
   return {
     type: AUTH_ERROR,
-    payload: { errorMessages: message, webStatus: status }
+    payload: { authError: { errorMessages: message, webStatus: status } },
   }
 }
 
 export function authReq(inProcess) {
   return {
     type: AUTH_REQ,
-    payload: inProcess
+    payload: { authProcess: inProcess },
   }
 }
 
-export function fetchMessages(message) {
-  return {
-    type: FETCH_MESSAGE,
-    payload: message
-  }
-}
-
-export function authUser(authType, token) {
+export function authUser(authType, authInfo) {
   return {
     type: AUTH_USER,
-    payload: { authProcess: messagesSet.authProcess.authUser, authType, token }
+    payload: { authProcess: messagesSet.authProcess.authUser, authType, authInfo },
   }
 }
 
 export function signOutUser() {
-  removeToken(['token', 'accountInfo', 'setupTime'])
+  removeToken()
   return {
     type: UNAUTH_USER,
-    payload: messagesSet.authProcess.unauthUser
+    payload: { authProcess: messagesSet.authProcess.unauthUser },
+  }
+}
+
+export function writeTokenStatus(status) {
+  return {
+    type: WRITE_TOKEN_STATUS,
+    payload: { tokenStatus: status },
+  }
+}
+
+export const getErrorInfo = (err) => {
+  const status = _.get(err, 'response', 500)
+  const message = _.get(err, ['response', 'data', 'status'], 'Internal Server Error')
+  return {
+    status,
+    message,
   }
 }
 
 export function signUpUser(email, password, apiUrl, signUpPath) {
-  return function(dispatch) {
+  return (dispatch) => {
     dispatch(authReq(messagesSet.authProcess.signUpReq))
-    return request.post(`${apiUrl}${signUpPath}`)
-      .set('Content-Type', 'application/json')
-      .send({ email, password })
-      .then((success) => {
-        dispatch(fetchMessages(messagesSet.app.afterSignUp))
-      }, (failure) => {
-        dispatch(authError(failure))
-      })
+    const axiosInstance = getAxiosInstance()
+    return new Promise((resolve, reject) => {
+      axiosInstance.post(`${apiUrl}${signUpPath}`, { email, password })
+        .then(() => {
+          resolve()
+        })
+        .catch((err) => {
+          const errorInfo = getErrorInfo(err)
+          dispatch(authError(errorInfo))
+          reject(errorInfo)
+        })
+    })
   }
 }
 
-export function activateUser(email, activeCode, apiUrl, activationPath) {
-  return function(dispatch) {
+export function activateUser(email, token, apiUrl, activationPath) {
+  return (dispatch) => {
     dispatch(authReq(messagesSet.authProcess.activationReq))
     return new Promise((resolve, reject) => {
-      request.get(`${apiUrl}${activationPath}?email=${email}&token=${activeCode}`)
+      const axiosInstance = getAxiosInstance()
+      axiosInstance.get(`${apiUrl}${activationPath}?email=${email}&token=${token}`)
         .then((res) => {
-          const webStatus = res.status
-          const parsedRes = JSON.parse(res.text);
-          const now = new Date().getTime()
-          setupToken({
-            'token': parsedRes.jwt,
-            'accountInfo': JSON.stringify(_.omit(parsedRes, ['jwt'])),
-            'setupTime': now
-          })
-          dispatch(authUser('account signUp/activate', ''))
+          setupTokenInLocalStorage(res.data)
+          dispatch(authUser('account signUp/activate', {}))
           resolve()
-        }, (err) => {
-          dispatch(authError(err))
+        })
+        .catch((err) => {
+          dispatch(authError(getErrorInfo(err)))
           reject()
         })
     })
@@ -83,27 +110,38 @@ export function activateUser(email, activeCode, apiUrl, activationPath) {
 }
 
 export function signInUser(email, password, apiUrl, signInPath) {
-  return function(dispatch) {
+  return (dispatch) => {
     dispatch(authReq(messagesSet.authProcess.signInReq))
     return new Promise((resolve, reject) => {
-      request.post(`${apiUrl}${signInPath}`)
-        .set('Content-Type', 'application/json')
-        .send({ email, password })
+      const axiosInstance = getAxiosInstance()
+      axiosInstance.post(`${apiUrl}${signInPath}`, { email, password })
         .then((res) => {
-          const webStatus = res.status
-          const parsedRes = JSON.parse(res.text);
-          const now = new Date().getTime()
-          setupToken({
-            'token': parsedRes.jwt,
-            'accountInfo': JSON.stringify(_.omit(parsedRes, ['jwt'])),
-            'setupTime': now
-          })
-          dispatch(authUser('account signIn', ''))
+          setupTokenInLocalStorage(res.data)
+          dispatch(authUser('account signIn', {}))
           resolve()
-        }, (err) => {
-          dispatch(authError(err))
-          reject()
         })
+        .catch((err) => {
+          const errorInfo = getErrorInfo(err)
+          dispatch(authError(errorInfo))
+          reject(errorInfo)
+        })
+    })
+  }
+}
+
+export function authenticateUserByToken(days, curretnAuthType) {
+  return (dispatch) => {
+    return new Promise((resolve, reject) => {
+      if (!tokenExpirationChecker(days)) {
+        const authType = `${curretnAuthType} verified token`
+        dispatch(writeTokenStatus(messagesSet.token.valid))
+        dispatch(authUser(authType, {}))
+        resolve()
+      } else {
+        dispatch(writeTokenStatus(messagesSet.token.invalid))
+        dispatch(signOutUser())
+        reject()
+      }
     })
   }
 }
