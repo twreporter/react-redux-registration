@@ -1,34 +1,50 @@
-/* eslint-disable */
-var gulp = require("gulp");
-var babel = require("gulp-babel");
-var rename = require("gulp-rename");
-var path = require('path')
+const gulp = require('gulp')
+const rimraf = require('rimraf')
+const path = require('path')
+const babel = require('gulp-babel')
+const fs = require('fs')
 
-var theBase = { base: './src' }
-var dest = 'lib'
+const babelOptions = JSON.parse(fs.readFileSync(path.resolve(__dirname, './.babelrc'), 'utf8'))
 
-function transpile() {
-  return gulp.src('./src/**/*', theBase)
-    .pipe(babel())
-    .pipe(gulp.dest(dest))
+const clean = target => cb => rimraf(target, { glob: false }, cb)
+
+gulp.task(
+  'clean-build',
+  clean(path.resolve(__dirname, './lib')))
+
+gulp.task(
+  'babel-src',
+  () => {
+    return gulp
+      .src(path.resolve(__dirname, './src/**'), { base: path.resolve(__dirname, './src') })
+      .pipe(babel(babelOptions))
+      .pipe(gulp.dest(path.resolve(__dirname, './lib')))
+  })
+
+let customerFolder = process.env.CUSTOMER_FOLDER
+if (typeof customerFolder !== 'string') {
+  customerFolder = path.resolve(__dirname, '../twreporter-react')
 }
+const destFolder = `${customerFolder}/node_modules/twreporter-registration/lib`
 
-// copy lib to node_modules under twreporter-react
-function teleport() {
-  let customerFolder = process.env.CUSTOMER_FOLDER
-  if (typeof customerFolder !== 'string') {
-    customerFolder = path.resolve(__dirname + '/../twreporter-react')
-  }
-  return gulp
-    .src('./lib/**/*')
-    .pipe(gulp.dest(customerFolder+'/node_modules/twreporter-registration/lib'))
-}
+gulp.task(
+  'clean-customer-folder',
+  clean(destFolder))
 
-gulp.task('build', transpile)
+gulp.task(
+  'copy-lib-to-customer-folder',
+  () => {
+    return gulp
+      .src('./lib/**', { base: './lib' })
+      .pipe(gulp.dest(destFolder))
+  })
 
-gulp.task('dev', gulp.series(transpile, teleport, () => {
-  const watcher = gulp.watch(['src/**'], gulp.series('build', teleport))
+gulp.task('build-to-customer-folder',
+  gulp.series('clean-build', 'babel-src', 'clean-customer-folder', 'copy-lib-to-customer-folder'))
+
+gulp.task('watch', () => {
+  const watcher = gulp.watch(['src/**', 'node_modules/**'], { delay: 500 }, gulp.series(['build-to-customer-folder']))
   watcher.on('change', (filePath) => {
     console.log(`File ${filePath} was changed, running tasks...`)
   })
-}))
+})

@@ -1,14 +1,17 @@
 {
   "name": "twreporter-registration",
-  "version": "1.0.0-beta.0.0.1",
+  "version": "1.0.0-beta.0.0.2",
   "description": "registration sginIn system ",
   "main": "lib/index.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha $(find src -name '*.test.js') --compilers js:babel-core/register",
-    "dev": "gulp dev",
-    "build": "npm run clean && gulp build",
-    "clean": "rimraf ./lib",
-    "lint": "eslint -c .eslintrc . "
+    "build": "npm run build:lib",
+    "clean:lib": "rimraf lib/*",
+    "build:lib": "npm run clean:lib && gulp babel-src",
+    "build:cus": "gulp build-to-customer-folder",
+    "lint": "eslint -c .eslintrc src ",
+    "validate": "npm ls",
+    "dev": "npm run build:cus && gulp watch"
   },
   "keywords": [
     "registration",
@@ -39,7 +42,8 @@
     "eslint-plugin-react": "^7.1.0",
     "gulp": "github:gulpjs/gulp#4.0",
     "gulp-babel": "^6.1.2",
-    "gulp-rename": "^1.2.2"
+    "gulp-rename": "^1.2.2",
+    "rimraf": "^2.6.2"
   },
   "dependencies": {
     "axios": "^0.16.2",

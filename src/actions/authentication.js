@@ -131,17 +131,13 @@ export function signInUser(email, password, apiUrl, signInPath) {
 
 export function authenticateUserByToken(days, curretnAuthType) {
   return (dispatch) => {
-    return new Promise((resolve, reject) => {
-      if (!tokenExpirationChecker(days)) {
-        const authType = `${curretnAuthType} verified token`
-        dispatch(writeTokenStatus(messagesSet.token.valid))
-        dispatch(authUser(authType, {}))
-        resolve()
-      } else {
-        dispatch(writeTokenStatus(messagesSet.token.invalid))
-        dispatch(signOutUser())
-        reject()
-      }
-    })
+    if (!tokenExpirationChecker(days)) {
+      const authType = `${curretnAuthType} verified token`
+      dispatch(writeTokenStatus(messagesSet.token.valid))
+      dispatch(authUser(authType, {}))
+    } else {
+      dispatch(writeTokenStatus(messagesSet.token.invalid))
+      dispatch(signOutUser())
+    }
   }
 }

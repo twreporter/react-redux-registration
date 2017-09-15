@@ -4,7 +4,7 @@ import React from 'react'
 import { OAuthButoon } from '../components/form-buttons'
 import { connect } from 'react-redux'
 import { SignInForm } from '../styles/common-variables'
-import { GOOGLE_LOGIN } from '../constants/SignIn'
+import { GOOGLE_LOGIN } from '../constants/string'
 
 const _ = {
   get,
