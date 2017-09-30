@@ -152,7 +152,6 @@ class SignInPrototype extends React.Component {
   }
 
   render() {
-    console.log('this.state.validationError: ', this.state.validationError)
     const { title, defaultStyle } = this.props
     const signInArea = (() => {
       return (

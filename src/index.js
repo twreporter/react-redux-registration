@@ -31,3 +31,30 @@ export {
   setupTokenInLocalStorage,
   tokenExpirationChecker,
 }
+
+export default {
+  components: {
+    ActivePage,
+    AuthenticationScreen,
+    SignInForm,
+    SignUpForm,
+    FacebookButton,
+    GoogleButton,
+  },
+  reducers: {
+    authReducer,
+    configureReducer,
+  },
+  actions: {
+    configureAction,
+    authUserAction,
+    signOutAction,
+    deletAuthInfoAction,
+    authUserByTokenAction,
+  },
+  utils: {
+    authInfoStringToObj,
+    setupTokenInLocalStorage,
+    tokenExpirationChecker,
+  },
+}

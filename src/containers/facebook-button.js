@@ -4,7 +4,7 @@ import React from 'react'
 import { OAuthButoon } from '../components/form-buttons'
 import { connect } from 'react-redux'
 import { SignInForm } from '../styles/common-variables'
-import { FACEBOOK_LOGIN } from '../constants/SignIn'
+import { FACEBOOK_LOGIN } from '../constants/string'
 
 const _ = {
   get,
