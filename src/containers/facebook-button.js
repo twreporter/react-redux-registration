@@ -1,17 +1,22 @@
+import { connect } from 'react-redux'
+import { FACEBOOK_LOGIN } from '../constants/string'
+import { OAuthButoon, IconContainer } from '../components/form-widgets'
+import FacebookIcon from '../static/facebook_button_logo.svg'
 import get from 'lodash/get'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { OAuthButoon } from '../components/form-buttons'
-import { connect } from 'react-redux'
-import { SignInForm } from '../styles/common-variables'
-import { FACEBOOK_LOGIN } from '../constants/string'
 
 const _ = {
   get,
 }
 
 const FacebookButton = OAuthButoon.extend`
-  background: linear-gradient(-180deg, ${SignInForm.buttons.facebook.light}  0%, ${SignInForm.buttons.facebook.dark} 90%);
+  position: relative;
+  background-color: #39579a;
+  &:link, :active, :visited, :focus {
+    color: white !important;
+    text-decoration: none;
+  }
 `
 
 const Facebook = (props) => {
@@ -20,7 +25,10 @@ const Facebook = (props) => {
     <FacebookButton
       href={`${apiUrl}${facebookPath}?location=${location}&domain=${domain}`}
     >
-      {`${FACEBOOK_LOGIN}`}
+      <IconContainer>
+        <FacebookIcon />
+      </IconContainer>
+      <span>{`${FACEBOOK_LOGIN}`}</span>
     </FacebookButton>
   )
 }

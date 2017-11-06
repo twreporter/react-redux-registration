@@ -1,25 +1,22 @@
+import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, INVALID_EMAIL, INVALID_PASSWORD, SIGN_UP, SIGN_IN_CHECK_BOX_LABEL, RESET_PASSWORD_REDIRECT, API_SIGNIN_ERROR } from '../constants/string'
+import { connect } from 'react-redux'
+import { EMAIL, PASSWORD } from '../constants/form'
+import { get } from 'lodash'
+import { Link } from 'react-router'
+import { LOCALSTORAGE_KEY_CHECKED } from '../config/config'
+import { NormalButton, CheckBox, Input, InputContainer, Title } from '../components/form-widgets'
+import { setupTokenInLocalStorage, tokenExpirationChecker } from '../utils/tokenManager'
+import { SignInForm } from '../styles/common-variables'
+import { signInUser, resetAuthError } from '../actions'
+import { validateEmail, validatePassword } from '../utils/validateForm'
+import { ValidationError, AuthError } from '../components/form-info'
 import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
-import validateEmail from '../utils/validateEmail'
-import { connect } from 'react-redux'
-import { get } from 'lodash'
-import { NormalButton } from '../components/form-buttons'
-import { signInUser, resetAuthError } from '../actions'
-import { SignInForm, font } from '../styles/common-variables'
-import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, INVALID_EMAIL } from '../constants/string'
-import { EMAIL, PASSWORD } from '../constants/form'
 
 const _ = {
   get,
 }
-
-const Title = styled.p`
-  width: 100%;
-  text-align: center;
-  font-size: ${SignInForm.title.fontSize};
-  color: ${font.color}
-`
 
 const Frame = styled.div`
   width: ${SignInForm.dimension.width};
@@ -28,42 +25,88 @@ const Frame = styled.div`
 const SigInSubFrame = styled.div`
   width: 100%;
   height: auto;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: ${props => (props.defaultStyle ? '1px solid #d8dee2' : 'none')};
-  border-radius: 5px;
+  margin-bottom: 25px;
   box-sizing: border-box;
   display: inline-block;
 `
 
 const SignUpSubFrame = styled.div`
   width: 100%;
-  height: auto;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: ${props => (props.defaultStyle ? '1px solid #d8dee2' : 'none')};
-  border-radius: 5px;
+  height: 13px;
+  line-height: 13px;
   box-sizing: border-box;
   display: inline-block;
-  font-size: ${font.size.base};
+  font-size: 13px;
+`
+const Division = styled.div`
+  width: ${SignInForm.dimension.width};
+  position: relative;
+  text-align: center;
+  height: 12px;
+  margin: 25px 0 25px 0;
 `
 
-const Input = styled.input`
-  margin-top: 10px;
-  margin-bottom: 17px;
-  width:100%;
-  height: ${SignInForm.inputs.height};
-  box-sizing : border-box;
-  border: 1px solid #d8dee2;
-  border-radius: 3px;
-  &:focus {
-    outline: none;
-    border:1px solid #719ECE;
-    box-shadow: 0 0 8px #7cb6f4;
- }
+const DivisionLine = styled.div`
+  display: inline-block;
+  width: 127px;
+  opacity: 0.2;
+  height: 2px;
+  background-color: #4a4949;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 `
 
-const SignInButton = NormalButton.extend``
+const DivisionLineLeft = DivisionLine.extend`
+  left: 0;
+`
+
+const DivisionLineRight = DivisionLine.extend`
+  right: 0;
+`
+
+const DivisionText = styled.div`
+  width: 12px;
+  height: 12px;
+  opacity: 0.3;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  color: #4a4949;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  line-height: 12px;
+`
+
+const SignInButton = NormalButton.extend`
+  margin: 0;
+`
+
+const UtilFrame = styled.div`
+  margin: 0 0 39px 0;
+  height: 29px;
+`
+
+const LinkStyle = styled.div`
+  display: inline-block;
+  a {
+    font-size: 13px;
+    font-weight: bold;
+    color: #a67a44;
+    &:hover {
+      color: #a67a44;
+      cursor: pointer;
+    }
+  }
+`
+
+const ForgetPassword = LinkStyle.extend`
+  height: 29px;
+  line-height: 29px;
+  float: right;
+`
 
 class SignInPrototype extends React.Component {
   constructor(props) {
@@ -72,10 +115,13 @@ class SignInPrototype extends React.Component {
       [EMAIL]: '',
       [PASSWORD]: '',
       authErrorMessage: '',
-      validationError: '',
+      validationErrorEmail: '',
+      validationErrorPassword: '',
+      checked: false,
     }
     this.handleOnClick = this._handleOnClick.bind(this)
     this.handleOnKeyDown = this._handleOnKeyDown.bind(this)
+    this.onClickCheckBox = this._onClickCheckBox.bind(this)
   }
 
   // In workflow, the redux state will store all auth errors.
@@ -96,6 +142,19 @@ class SignInPrototype extends React.Component {
   //   }
   // }
 
+  componentDidMount() {
+    tokenExpirationChecker(7, LOCALSTORAGE_KEY_CHECKED)
+    const checkedInfoString = localStorage.getItem(LOCALSTORAGE_KEY_CHECKED)
+    const checkedInfoObj = JSON.parse(checkedInfoString)
+    if (checkedInfoObj) {
+      // eslint-disable-next-line react/no-did-mount-set-state
+      this.setState({
+        [EMAIL]: checkedInfoObj.account,
+        checked: true,
+      })
+    }
+  }
+
   handleChange(e) {
     const target = e.target
     const name = target.name
@@ -108,21 +167,36 @@ class SignInPrototype extends React.Component {
     const { signIn, router, signInRedirectPath } = this.props
     if (!validateEmail(this.state[EMAIL])) {
       this.setState({
-        validationError: INVALID_EMAIL,
+        validationErrorEmail: INVALID_EMAIL,
+        validationErrorPassword: '',
       })
       // prevent program run to following statements
       return
     }
+    if (!validatePassword(this.state[PASSWORD])) {
+      this.setState({
+        validationErrorEmail: '',
+        validationErrorPassword: INVALID_PASSWORD,
+      })
+      return
+    }
+    if (this.state.checked) {
+      setupTokenInLocalStorage({ account: this.state[EMAIL] }, LOCALSTORAGE_KEY_CHECKED)
+    } else {
+      localStorage.removeItem(LOCALSTORAGE_KEY_CHECKED)
+    }
     this.setState({
-      validationError: '',
+      validationErrorEmail: '',
+      validationErrorPassword: '',
     }, () => {
       signIn(this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signInPath)
         .then(() => {
           router.push(signInRedirectPath)
         })
-        .catch((errorInfo) => {
+        .catch(() => {
+          // const errorMsg = _.get(error, 'message', 'default error!')
           this.setState({
-            authErrorMessage: _.get(errorInfo, 'message', 'default error!'),
+            authErrorMessage: API_SIGNIN_ERROR,
           })
         })
     })
@@ -134,6 +208,12 @@ class SignInPrototype extends React.Component {
     }
   }
 
+  _onClickCheckBox(v) {
+    this.setState({
+      checked: v,
+    })
+  }
+
   generateInput() {
     // label for input
     const label = {
@@ -141,23 +221,61 @@ class SignInPrototype extends React.Component {
       [PASSWORD]: PASSWORD_LABEL,
     }
 
+    const error = {
+      [EMAIL]: this.state.validationErrorEmail,
+      [PASSWORD]: this.state.validationErrorPassword,
+    }
+
     return [EMAIL, PASSWORD].map((v) => {
       return (
         <div key={v}>
-          <label htmlFor={v}>{`${label[v]}:`}</label>
-          <Input id={v} type={v} name={v} onChange={(e) => { this.handleChange(e) }} onKeyDown={this.handleOnKeyDown} />
+          <InputContainer>
+            <Input
+              placeholder={`${label[v]}: `}
+              id={v}
+              type={v}
+              name={v}
+              onChange={(e) => { this.handleChange(e) }}
+              onKeyDown={this.handleOnKeyDown}
+              value={this.state[v]}
+            />
+            { error[v] ? <ValidationError>{error[v]}</ValidationError> : null }
+          </InputContainer>
         </div>
       )
     })
   }
-
   render() {
-    const { title, defaultStyle } = this.props
+    const { title } = this.props
     const signInArea = (() => {
       return (
-        <SigInSubFrame defaultStyle={defaultStyle}>
+        <SigInSubFrame>
+          {
+            this.props.children ?
+              <div>
+                {this.props.children}
+                <Division>
+                  <DivisionLineLeft />
+                  <DivisionText>或</DivisionText>
+                  <DivisionLineRight />
+                </Division>
+              </div>
+              : null
+          }
           <div>
             { this.generateInput() }
+            <UtilFrame>
+              <CheckBox
+                text={SIGN_IN_CHECK_BOX_LABEL}
+                onToggle={this.onClickCheckBox}
+                checked={this.state.checked}
+              />
+              <ForgetPassword>
+                <Link to="/forgetpw">
+                  {RESET_PASSWORD_REDIRECT}
+                </Link>
+              </ForgetPassword>
+            </UtilFrame>
             <SignInButton
               onClick={this.handleOnClick}
               type="button"
@@ -165,28 +283,31 @@ class SignInPrototype extends React.Component {
               {`${SIGN_IN}`}
             </SignInButton>
           </div>
-          {this.props.children}
         </SigInSubFrame>
       )
     })()
+    const signUpArea = (() => {
+      return (
+        <SignUpSubFrame>
+          <span>{`${SIGN_UP.plainText}`}&nbsp;</span>
+          <LinkStyle><Link to="/signup">{`${SIGN_UP.linkText}`}</Link></LinkStyle>
+        </SignUpSubFrame>
+      )
+    })()
 
-    const theForm = (() => {
+    const Form = (() => {
       return (
         <div>
           <Title>{`${title}`}</Title>
+          { this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null }
           {signInArea}
-          <SignUpSubFrame defaultStyle={defaultStyle}>{this.props.signUpArea}</SignUpSubFrame>
-          { this.state.authErrorMessage ? <div>{this.state.authErrorMessage}</div> : <span /> }
-          { this.state.validationError ? <div>{this.state.validationError}</div> : <span /> }
+          {signUpArea}
         </div>
       )
     })()
 
     const formWrapper = (() => {
-      if (this.props.defaultStyle) {
-        return <Frame>{theForm}</Frame>
-      }
-      return <div>{theForm}</div>
+      return <Frame>{Form}</Frame>
     })()
 
     return (
@@ -211,8 +332,6 @@ SignInPrototype.propTypes = {
   title: PropTypes.string,
   router: PropTypes.object.isRequired,
   signInRedirectPath: PropTypes.string,
-  signUpArea: PropTypes.element.isRequired,
-  defaultStyle: PropTypes.bool.isRequired,
   children: React.PropTypes.oneOfType([
     React.PropTypes.arrayOf(React.PropTypes.node),
     React.PropTypes.node,

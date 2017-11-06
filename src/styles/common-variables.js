@@ -6,7 +6,9 @@ export const font = {
     large: '18px',
     h2: '20px',
   },
-  color: '#333',
+  color: {
+    title: '#4a4949',
+  },
 }
 
 /**
@@ -15,11 +17,12 @@ export const font = {
 */
 
 // WIDGETHEIGHT control heights of inputs and buttons
-const WIDGETHEIGHT = '32px'
-const TITLEFONTSIZE = '27px'
+const WIDGETHEIGHT = '55px'
+const TITLEFONTSIZE = '34px'
 const BUTTONDARK = '#1f1f1f'
 const BUTTONLIGHT = '#333333'
 const FONTCOLOR = '#fff'
+export const FORM_WIDTH = '275px'
 
 export const SignInForm = {
   title: {
@@ -31,12 +34,10 @@ export const SignInForm = {
   buttons: {
     fontColor: FONTCOLOR,
     height: WIDGETHEIGHT,
-    facebook: { light: '#476bb8', dark: '#3B5998' },
-    google: { light: '#df4d3a', dark: '#DE4734' },
     signin: { light: BUTTONLIGHT, dark: BUTTONDARK },
   },
   dimension: {
-    width: '308px',
+    width: FORM_WIDTH,
   },
 }
 
@@ -53,6 +54,6 @@ export const SignUpForm = {
     color: { light: BUTTONLIGHT, dark: BUTTONDARK },
   },
   dimension: {
-    width: '308px',
+    width: FORM_WIDTH,
   },
 }

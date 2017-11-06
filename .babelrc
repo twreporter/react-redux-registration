@@ -1,3 +1,25 @@
 {
-  "presets": ["es2015", "es2017", "react", "stage-0"]
+  "presets": [
+    "es2015",
+    "es2017",
+    "react",
+    "stage-0"
+  ],
+  "comments": false,
+  "ignore": [
+    "src/**/*.svg"
+  ],
+  "plugins": [
+    [
+      "inline-react-svg", {
+        "svgo": {
+          "plugins": [
+            {
+              "cleanupIDs": false
+            }
+          ]
+        }
+      }
+    ]
+  ]
 }

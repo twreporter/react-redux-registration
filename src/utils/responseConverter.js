@@ -9,7 +9,7 @@ export function authInfoStringToObj(auth_Info_string) {
     return auth_Info_string
   }
   const authInfoObj = JSON.parse(auth_Info_string)
-  const currentTime = new Date().getTime()
-  authInfoObj[SETUP_TIME] = currentTime
+  // const currentTime = new Date().getTime()
+  // authInfoObj[SETUP_TIME] = currentTime
   return authInfoObj
 }

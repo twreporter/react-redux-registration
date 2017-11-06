@@ -10,7 +10,10 @@ import configureReducer from './reducers/configure'
 import { configure as configureAction, authUser as authUserAction, signOutUser as signOutAction, deletAuthInfo as deletAuthInfoAction, authenticateUserByToken as authUserByTokenAction } from './actions'
 import { authInfoStringToObj } from './utils/responseConverter'
 import { setupTokenInLocalStorage, tokenExpirationChecker } from './utils/tokenManager'
-// import * from './actions/types'
+import * as keys from './config/config'
+import PageContainer from './components/page-container'
+import ForgetPassword from './containers/forget-password'
+import ChangePassword from './containers/change-password'
 
 export {
   ActivePage,
@@ -30,6 +33,10 @@ export {
   authInfoStringToObj,
   setupTokenInLocalStorage,
   tokenExpirationChecker,
+  keys,
+  PageContainer,
+  ForgetPassword,
+  ChangePassword,
 }
 
 export default {
@@ -40,6 +47,9 @@ export default {
     SignUpForm,
     FacebookButton,
     GoogleButton,
+    PageContainer,
+    ForgetPassword,
+    ChangePassword,
   },
   reducers: {
     authReducer,
@@ -57,4 +67,5 @@ export default {
     setupTokenInLocalStorage,
     tokenExpirationChecker,
   },
+  keys,
 }

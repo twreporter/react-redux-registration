@@ -1,17 +1,23 @@
+import { connect } from 'react-redux'
+import { GOOGLE_LOGIN } from '../constants/string'
+import { OAuthButoon, IconContainer } from '../components/form-widgets'
 import get from 'lodash/get'
+import GoogleIcon from '../static/google_button_logo.svg'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { OAuthButoon } from '../components/form-buttons'
-import { connect } from 'react-redux'
-import { SignInForm } from '../styles/common-variables'
-import { GOOGLE_LOGIN } from '../constants/string'
 
 const _ = {
   get,
 }
 
 const GoogleButton = OAuthButoon.extend`
-  background: linear-gradient(-180deg, ${SignInForm.buttons.google.light}  0%, ${SignInForm.buttons.google.dark} 90%);
+  position: relative;
+  background-color: white;
+  &:link, :active, :visited, :focus {
+    color: #4a4949 !important;
+    text-decoration: none;
+  }
+  margin-bottom: 0;
 `
 
 const Google = (props) => {
@@ -20,7 +26,10 @@ const Google = (props) => {
     <GoogleButton
       href={`${apiUrl}${googlePath}?location=${location}&domain=${domain}`}
     >
-      {`${GOOGLE_LOGIN}`}
+      <IconContainer>
+        <GoogleIcon />
+      </IconContainer>
+      <span>{`${GOOGLE_LOGIN}`}</span>
     </GoogleButton>
   )
 }

@@ -1,57 +1,58 @@
+// import { withRouter } from 'react-router'
+import { connect } from 'react-redux'
+import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INCONSISTENT_PASSWORD, INVALID_EMAIL, INVALID_PASSWORD, SIGN_UP_CHECK_BOX_LABEL } from '../constants/string'
+import { EMAIL, PASSWORD, CONFIRM } from '../constants/form'
+import { get } from 'lodash'
+import { NormalButtonStyle, Input, InputContainer, CheckBox, Title } from '../components/form-widgets'
+import { SignUpForm } from '../styles/common-variables'
+import { signUpUser, resetAuthError } from '../actions'
+import { validateEmail, validatePassword } from '../utils/validateForm'
+import { ValidationError, AuthError } from '../components/form-info'
 import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
-import validateEmail from '../utils/validateEmail'
-import { connect } from 'react-redux'
-import { get } from 'lodash'
-import { NormalButton } from '../components/form-buttons'
-import { signUpUser, resetAuthError } from '../actions'
-import { SignUpForm, font } from '../styles/common-variables'
-// import { withRouter } from 'react-router'
-import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INCONSISTENT_PASSWORD, INVALID_EMAIL } from '../constants/string'
-import { EMAIL, PASSWORD, CONFIRM } from '../constants/form'
 
 const _ = {
   get,
 }
 
-const Title = styled.p`
-  width: 100%;
-  text-align: center;
-  font-size: ${SignUpForm.title.fontSize};
-  color: ${font.color}
-`
+const mailChimpURL = '//twreporter.us14.list-manage.com/subscribe/post?u=4da5a7d3b98dbc9fdad009e7e&id=e0eb0c8c32'
 
-const Frame = styled.div`
+const Form = styled.form`
   width: ${SignUpForm.dimension.width};
 `
 
 const SignUpSubFrame = styled.div`
   width: 100%;
   height: auto;
-  padding: 20px;
-  border: 1px solid #d8dee2;
-  border-radius: 5px;
   box-sizing: border-box;
   display: inline-block;
 `
 
-const Input = styled.input`
-  margin-top: 10px;
-  margin-bottom: 17px;
-  width:100%;
-  height: ${SignUpForm.inputs.height};
-  box-sizing : border-box;
-  border: 1px solid #d8dee2;
-  border-radius: 3px;
-  &:focus {
-    outline: none !important;
-    border:1px solid #719ECE;
-    box-shadow: 0 0 8px #7cb6f4;
- }
+const SignUpButton = styled.input`
+  ${NormalButtonStyle};
+  margin: 0;
 `
 
-const SignUpButton = NormalButton.extend``
+const Policy = styled.div`
+  margin-top: 15px;
+  margin-bottom: 25px;
+  width: 275px;
+  height: 12px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-align: left;
+  color: #4a4949;
+  line-height: 12px;
+  a {
+    font-weight: bold;
+    color: #a67a44;
+    &:hover {
+      color: #a67a44;
+      cursor: pointer;
+    }
+  }
+`
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -60,12 +61,18 @@ class SignUp extends React.Component {
       [EMAIL]: '',
       [PASSWORD]: '',
       [CONFIRM]: '',
-      validationError: '',
+      invalidEmail: '',
+      invalidPassword: '',
+      invalidInconsistentPW: '',
       ifSignUpSuccessfully: false,
       authErrorMessage: '',
+      checked: false,
     }
+    this.form = {}
     this.handleOnClick = this._handleOnClick.bind(this)
     this.handleOnKeyDown = this._handleOnKeyDown.bind(this)
+    this.onClickCheckBox = this._onClickCheckBox.bind(this)
+    this.handleSubmit = this._handleSubmit.bind(this)
   }
 
   // In workflow, the redux state will store all auth errors.
@@ -94,36 +101,55 @@ class SignUp extends React.Component {
     })
   }
 
-  _handleOnClick() {
+  _handleOnClick(clickSetState) {
     // check validation
-    let validationError
-    if (this.state[PASSWORD] !== this.state[CONFIRM]) {
-      validationError = INCONSISTENT_PASSWORD
-    }
     if (!validateEmail(this.state[EMAIL])) {
-      validationError = INVALID_EMAIL
+      clickSetState('invalidEmail', INVALID_EMAIL)
+      return Promise.reject()
     }
-    if (validationError) {
-      this.setState({
-        validationError,
+    if (!validatePassword(this.state[PASSWORD])) {
+      clickSetState('invalidPassword', INVALID_PASSWORD)
+      return Promise.reject()
+    }
+    if (this.state[PASSWORD] !== this.state[CONFIRM]) {
+      clickSetState('invalidInconsistentPW', INCONSISTENT_PASSWORD)
+      // return new Promise.Reject(
+      return Promise.reject()
+    }
+    return this.props.signUp(this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signUpPath)
+  }
+
+  _handleSubmit(e) {
+    e.preventDefault()
+    const clickSetState = (key, value) => {
+      const defaultInfoState = {
+        invalidEmail: '',
+        invalidPassword: '',
+        invalidInconsistentPW: '',
         authErrorMessage: '',
-      })
-      // prevent program run to following statements
-      return
+        ifSignUpSuccessfully: false,
+      }
+      defaultInfoState[key] = value
+      this.setState(defaultInfoState)
     }
-    this.props.signUp(this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signUpPath)
+    this._handleOnClick(clickSetState)
       .then(() => {
-        this.setState({
-          validationError: '',
-          ifSignUpSuccessfully: true,
-        })
+        clickSetState('ifSignUpSuccessfully', true)
+        if (this.state.checked) {
+          this.form.submit()
+        }
       })
       .catch((errorInfo) => {
-        this.setState({
-          validationError: '',
-          authErrorMessage: errorInfo.message,
-        })
+        if (errorInfo) {
+          clickSetState('authErrorMessage', errorInfo.message)
+        }
       })
+  }
+
+  _onClickCheckBox() {
+    this.setState({
+      checked: !this.state.checked,
+    })
   }
 
   _handleOnKeyDown(e) {
@@ -140,16 +166,25 @@ class SignUp extends React.Component {
     }
 
     return [EMAIL, PASSWORD, CONFIRM].map((v) => {
+      const { invalidEmail, invalidPassword, invalidInconsistentPW } = this.state
+      const error = {
+        [EMAIL]: invalidEmail,
+        [PASSWORD]: invalidPassword,
+        [CONFIRM]: invalidInconsistentPW,
+      }
       return (
         <div key={`key_${v}`}>
-          <Input
-            id={v}
-            type={v === CONFIRM ? PASSWORD : v}
-            name={v}
-            placeholder={PHMap[v]}
-            onChange={(event) => { this.handleChange(event) }}
-            onKeyDown={this.handleOnKeyDown}
-          />
+          <InputContainer>
+            <Input
+              id={v}
+              type={v === CONFIRM ? PASSWORD : v}
+              name={v}
+              placeholder={PHMap[v]}
+              onChange={(event) => { this.handleChange(event) }}
+              onKeyDown={this.handleOnKeyDown}
+            />
+            { error[v] ? <ValidationError>{error[v]}</ValidationError> : null }
+          </InputContainer>
         </div>
       )
     })
@@ -157,21 +192,31 @@ class SignUp extends React.Component {
 
   render() {
     return (
-      <Frame>
+      <Form
+        action={mailChimpURL}
+        method="post"
+        name="subscribe-form"
+        target="_blank"
+        onSubmit={this.handleSubmit}
+        novalidate
+        innerRef={(node) => { this.form = node }}
+      >
         <Title>{this.props.title}</Title>
         <SignUpSubFrame>
           { this.generateInput() }
-          <SignUpButton
-            type="button"
-            onClick={this.handleOnClick}
-          >
-            {SIGNUP_LABEL}
-          </SignUpButton>
         </SignUpSubFrame>
-        { this.state.validationError ? <div>{this.state.validationError}</div> : null}
+        <CheckBox
+          text={SIGN_UP_CHECK_BOX_LABEL}
+          onToggle={this.onClickCheckBox}
+          checked={this.state.checked}
+        />
+        <Policy>
+          透過註冊，你同意報導者的<a>條款及細則</a>與<a>隱私政策</a>
+        </Policy>
+        <SignUpButton type="submit" value={SIGNUP_LABEL} name="subscribe" />
         { this.state.ifSignUpSuccessfully ? <div>{this.props.signUpMessage}</div> : null}
-        { this.state.authErrorMessage ? <div>{this.state.authErrorMessage}</div> : null}
-      </Frame>
+        { this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null}
+      </Form>
     )
   }
 }

@@ -4,4 +4,14 @@ const validateEmail = (email) => {
   return re.test(email)
 }
 
-export default validateEmail
+const validatePassword = (pw) => {
+  if (pw) {
+    return true
+  }
+  return false
+}
+
+export {
+  validateEmail,
+  validatePassword,
+}

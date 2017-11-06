@@ -1,3 +1,8 @@
+### Unrelease
+- Add forget, change password pages.
+- Update frontend style.
+- Change localstorage get/store process.
+
 ### 1.0.0-beta.0.0.6
 
 - Remove next from package.json
