@@ -3,6 +3,7 @@ import get from 'lodash/get'
 import { AUTH_USER, UNAUTH_USER, AUTH_ERROR, AUTH_REQ, DELETE_AUTHINFO, WRITE_TOKEN_STATUS, RESET_AUTH_ERROR } from './types'
 import { messagesSet } from '../constants/messageSet'
 import { setupTokenInLocalStorage, removeToken, tokenExpirationChecker } from '../utils/tokenManager'
+import { LOCALSTORAGE_KEY_AUTH } from '../config/config'
 
 const _ = {
   get,
@@ -49,7 +50,7 @@ export function authUser(authType, authInfo) {
 }
 
 export function signOutUser() {
-  removeToken()
+  removeToken(LOCALSTORAGE_KEY_AUTH)
   return {
     type: UNAUTH_USER,
     payload: { authProcess: messagesSet.authProcess.unauthUser },
@@ -72,12 +73,12 @@ export const getErrorInfo = (err) => {
   }
 }
 
-export function signUpUser(email, password, apiUrl, signUpPath) {
+export function signUpUser(email, apiUrl, signUpPath) {
   return (dispatch) => {
     dispatch(authReq(messagesSet.authProcess.signUpReq))
     const axiosInstance = getAxiosInstance()
     return new Promise((resolve, reject) => {
-      axiosInstance.post(`${apiUrl}${signUpPath}`, { email, password })
+      axiosInstance.post(`${apiUrl}${signUpPath}`, { email })
         .then(() => {
           resolve()
         })
@@ -97,7 +98,7 @@ export function activateUser(email, token, apiUrl, activationPath) {
       const axiosInstance = getAxiosInstance()
       axiosInstance.get(`${apiUrl}${activationPath}?email=${email}&token=${token}`)
         .then((res) => {
-          setupTokenInLocalStorage(res.data)
+          setupTokenInLocalStorage(res.data, LOCALSTORAGE_KEY_AUTH)
           dispatch(authUser('account signUp/activate', {}))
           resolve()
         })
@@ -109,15 +110,15 @@ export function activateUser(email, token, apiUrl, activationPath) {
   }
 }
 
-export function signInUser(email, password, apiUrl, signInPath) {
+export function signInUser(email, apiUrl, signInPath, destination) {
   return (dispatch) => {
     dispatch(authReq(messagesSet.authProcess.signInReq))
     return new Promise((resolve, reject) => {
       const axiosInstance = getAxiosInstance()
-      axiosInstance.post(`${apiUrl}${signInPath}`, { email, password })
-        .then((res) => {
-          setupTokenInLocalStorage(res.data)
-          dispatch(authUser('account signIn', {}))
+      axiosInstance.post(`${apiUrl}${signInPath}`, { email, destination })
+        .then(() => {
+          // setupTokenInLocalStorage(res.data, LOCALSTORAGE_KEY_AUTH)
+          // dispatch(authUser('account signIn', {}))
           resolve()
         })
         .catch((err) => {
@@ -129,10 +130,26 @@ export function signInUser(email, password, apiUrl, signInPath) {
   }
 }
 
-export function authenticateUserByToken(days, curretnAuthType) {
+export function forgetPassword(email, apiUrl, path) {
   return (dispatch) => {
-    if (!tokenExpirationChecker(days)) {
-      const authType = `${curretnAuthType} verified token`
+    dispatch(authReq(messagesSet.authProcess.forgetpassword))
+    const axiosInstance = getAxiosInstance()
+    return axiosInstance.post(`${apiUrl}${path}`, { email })
+  }
+}
+
+export function changePassword(email, password, token, apiUrl, path) {
+  return (dispatch) => {
+    dispatch(authReq(messagesSet.authProcess.forgetpassword))
+    const axiosInstance = getAxiosInstance()
+    return axiosInstance.post(`${apiUrl}${path}`, { email, password, token })
+  }
+}
+
+export function authenticateUserByToken(days, currentAuthType) {
+  return (dispatch) => {
+    if (!tokenExpirationChecker(days, LOCALSTORAGE_KEY_AUTH)) {
+      const authType = `${currentAuthType} verified token`
       dispatch(writeTokenStatus(messagesSet.token.valid))
       dispatch(authUser(authType, {}))
     } else {

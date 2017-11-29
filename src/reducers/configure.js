@@ -15,6 +15,8 @@ export default function (initialState) {
 /*
 const initialState = {
   apiUrl: '',
+  forgetPassword: '',
+  changePassword: '',
   signUp: '',
   signIn: '',
   activate: '',

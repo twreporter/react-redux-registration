@@ -7,6 +7,7 @@ module.exports = {
     signIn: '/v1/login',
     signUp: '/v1/signup',
     activate: '/v1/activate',
-    bookmarks: ''
-  }
+    forgetPassword: '/v1/forget-password',
+    changePassword: '/v1/change-password',
+  },
 }

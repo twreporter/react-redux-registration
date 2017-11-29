@@ -1,3 +1,13 @@
+### Unrelease
+
+### 2.0.0
+- Add forget, change password pages.
+- Update frontend to desgin of Gina.
+- Change localstorage get/store process.
+- New Registration Process
+- Sign Up/In -> Email -> Activation -> Page
+- Rename package from twreporter-registration to @twreporter/registration
+
 ### 1.0.0-beta.0.0.6
 
 - Remove next from package.json

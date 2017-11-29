@@ -1,26 +1,34 @@
+import { connect } from 'react-redux'
+import { FACEBOOK_LOGIN } from '../constants/string'
+import { OAuthButoon, IconContainer } from '../components/form-widgets'
+import FacebookIcon from '../static/facebook_button_logo.svg'
 import get from 'lodash/get'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { OAuthButoon } from '../components/form-buttons'
-import { connect } from 'react-redux'
-import { SignInForm } from '../styles/common-variables'
-import { FACEBOOK_LOGIN } from '../constants/string'
 
 const _ = {
   get,
 }
 
 const FacebookButton = OAuthButoon.extend`
-  background: linear-gradient(-180deg, ${SignInForm.buttons.facebook.light}  0%, ${SignInForm.buttons.facebook.dark} 90%);
+  position: relative;
+  background-color: #39579a;
+  &:link, :active, :visited, :focus {
+    color: white !important;
+    text-decoration: none;
+  }
 `
 
 const Facebook = (props) => {
-  const { apiUrl, facebookPath, location, domain } = props
+  const { apiUrl, facebookPath, host, activatePagePath } = props
   return (
     <FacebookButton
-      href={`${apiUrl}${facebookPath}?location=${location}&domain=${domain}`}
+      href={`${apiUrl}${facebookPath}?destination=${host}/${activatePagePath}`}
     >
-      {`${FACEBOOK_LOGIN}`}
+      <IconContainer>
+        <FacebookIcon />
+      </IconContainer>
+      <span>{`${FACEBOOK_LOGIN}`}</span>
     </FacebookButton>
   )
 }
@@ -29,23 +37,22 @@ const Facebook = (props) => {
 Facebook.defaultProps = {
   apiUrl: '',
   facebookPath: '',
-  location: '',
-  domain: '',
+  host: '',
+  activatePagePath: '',
 }
 
 Facebook.propTypes = {
   apiUrl: PropTypes.string,
   facebookPath: PropTypes.string,
-  location: PropTypes.string,
-  domain: PropTypes.string,
+  host: PropTypes.string,
+  activatePagePath: PropTypes.string,
 }
 
 function mapStateToProps(state) {
   return {
     apiUrl: _.get(state, 'authConfigure.apiUrl', ''),
     facebookPath: _.get(state, 'authConfigure.oAuthProviders.facebook', ''),
-    location: _.get(state, 'authConfigure.location', ''),
-    domain: _.get(state, 'authConfigure.domain', ''),
+    host: _.get(state, 'authConfigure.host', ''),
   }
 }
 

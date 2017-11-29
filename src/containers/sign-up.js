@@ -1,71 +1,76 @@
+// import { withRouter } from 'react-router'
+import { connect } from 'react-redux'
+import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INVALID_EMAIL, SIGN_UP_CHECK_BOX_LABEL, CONFLICTING_ACCOUNT, DEFAULT_API_ERROR } from '../constants/string'
+import { EMAIL, PASSWORD, CONFIRM } from '../constants/form'
+import { get } from 'lodash'
+import { NormalButtonStyle, Input, InputContainer, CheckBox, Title } from '../components/form-widgets'
+import { signInUser, resetAuthError } from '../actions'
+import { validateEmail } from '../utils/validateForm'
+import { ValidationError, AuthError } from '../components/form-info'
 import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
-import validateEmail from '../utils/validateEmail'
-import { connect } from 'react-redux'
-import { get } from 'lodash'
-import { NormalButton } from '../components/form-buttons'
-import { signUpUser, resetAuthError } from '../actions'
-import { SignUpForm, font } from '../styles/common-variables'
-// import { withRouter } from 'react-router'
-import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INCONSISTENT_PASSWORD, INVALID_EMAIL } from '../constants/string'
-import { EMAIL, PASSWORD, CONFIRM } from '../constants/form'
 
 const _ = {
   get,
 }
 
-const Title = styled.p`
-  width: 100%;
-  text-align: center;
-  font-size: ${SignUpForm.title.fontSize};
-  color: ${font.color}
-`
-
-const Frame = styled.div`
-  width: ${SignUpForm.dimension.width};
-`
+const ACCOUNT_CONFLICT_MSG = 'Account is already signup'
+// This is for original design
+// const INPUT_CONTENT = [EMAIL, PASSWORD, CONFIRM]
+const INPUT_CONTENT = [EMAIL]
 
 const SignUpSubFrame = styled.div`
   width: 100%;
   height: auto;
-  padding: 20px;
-  border: 1px solid #d8dee2;
-  border-radius: 5px;
   box-sizing: border-box;
   display: inline-block;
 `
 
-const Input = styled.input`
-  margin-top: 10px;
-  margin-bottom: 17px;
-  width:100%;
-  height: ${SignUpForm.inputs.height};
-  box-sizing : border-box;
-  border: 1px solid #d8dee2;
-  border-radius: 3px;
-  &:focus {
-    outline: none !important;
-    border:1px solid #719ECE;
-    box-shadow: 0 0 8px #7cb6f4;
- }
+const SignUpButton = styled.input`
+  ${NormalButtonStyle};
+  display: block;
+  margin-top: 25px;
 `
 
-const SignUpButton = NormalButton.extend``
+/*
+const Policy = styled.div`
+  margin-top: 15px;
+  margin-bottom: 25px;
+  width: 275px;
+  height: 12px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-align: left;
+  color: #4a4949;
+  line-height: 12px;
+  a {
+    font-weight: bold;
+    color: #a67a44;
+    &:hover {
+      color: #a67a44;
+      cursor: pointer;
+    }
+  }
+`
+
+<Policy>
+  透過註冊，你同意報導者的<a>條款及細則</a>與<a>隱私政策</a>
+</Policy>
+*/
 
 class SignUp extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       [EMAIL]: '',
-      [PASSWORD]: '',
-      [CONFIRM]: '',
-      validationError: '',
-      ifSignUpSuccessfully: false,
+      invalidEmail: '',
       authErrorMessage: '',
+      checked: false,
     }
     this.handleOnClick = this._handleOnClick.bind(this)
     this.handleOnKeyDown = this._handleOnKeyDown.bind(this)
+    this.onClickCheckBox = this._onClickCheckBox.bind(this)
   }
 
   // In workflow, the redux state will store all auth errors.
@@ -94,36 +99,66 @@ class SignUp extends React.Component {
     })
   }
 
-  _handleOnClick() {
+  _validationCheck(clickSetState) {
     // check validation
-    let validationError
-    if (this.state[PASSWORD] !== this.state[CONFIRM]) {
-      validationError = INCONSISTENT_PASSWORD
-    }
     if (!validateEmail(this.state[EMAIL])) {
-      validationError = INVALID_EMAIL
+      clickSetState('invalidEmail', INVALID_EMAIL)
+      return false
     }
-    if (validationError) {
-      this.setState({
-        validationError,
+    /*
+    if (!validatePassword(this.state[PASSWORD])) {
+      clickSetState('invalidPassword', INVALID_PASSWORD)
+      return false
+    }
+    if (this.state[PASSWORD] !== this.state[CONFIRM]) {
+      clickSetState('invalidInconsistentPW', INCONSISTENT_PASSWORD)
+      // return new Promise.Reject(
+      return false
+    }
+    */
+    return true
+  }
+
+  _handleOnClick() {
+    const { location, apiUrl, signInPath, host } = this.props
+    const destinationPath = _.get(location, 'query.destinationPath', '')
+    const clickSetState = (key, value) => {
+      const defaultInfoState = {
+        invalidEmail: '',
+        invalidInconsistentPW: '',
         authErrorMessage: '',
-      })
-      // prevent program run to following statements
+      }
+      defaultInfoState[key] = value
+      this.setState(defaultInfoState)
+    }
+    if (!this._validationCheck(clickSetState)) {
       return
     }
-    this.props.signUp(this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signUpPath)
+    const destination = destinationPath ? `${host}/${destinationPath}` : `${host}`
+    this.props.signUp(this.state[EMAIL], apiUrl, signInPath, destination)
       .then(() => {
-        this.setState({
-          validationError: '',
-          ifSignUpSuccessfully: true,
-        })
+        const { router, redirectPath } = this.props
+        const { checked } = this.state
+        const checkedVlaue = checked ? 'true' : 'false'
+        router.push(`/${redirectPath}?checked=${checkedVlaue}&email=${this.state[EMAIL]}&action=signUp`)
       })
       .catch((errorInfo) => {
-        this.setState({
-          validationError: '',
-          authErrorMessage: errorInfo.message,
-        })
+        if (errorInfo) {
+          const errorObj = errorInfo.status
+          const { data, status } = errorObj
+          if (status === 409 && data.message === ACCOUNT_CONFLICT_MSG) {
+            clickSetState('authErrorMessage', CONFLICTING_ACCOUNT)
+          } else {
+            clickSetState('authErrorMessage', DEFAULT_API_ERROR)
+          }
+        }
       })
+  }
+
+  _onClickCheckBox() {
+    this.setState({
+      checked: !this.state.checked,
+    })
   }
 
   _handleOnKeyDown(e) {
@@ -139,17 +174,26 @@ class SignUp extends React.Component {
       [CONFIRM]: CONFIRM_PLACEHOLDER,
     }
 
-    return [EMAIL, PASSWORD, CONFIRM].map((v) => {
+    return INPUT_CONTENT.map((v) => {
+      const { invalidEmail, invalidPassword, invalidInconsistentPW } = this.state
+      const error = {
+        [EMAIL]: invalidEmail,
+        [PASSWORD]: invalidPassword,
+        [CONFIRM]: invalidInconsistentPW,
+      }
       return (
         <div key={`key_${v}`}>
-          <Input
-            id={v}
-            type={v === CONFIRM ? PASSWORD : v}
-            name={v}
-            placeholder={PHMap[v]}
-            onChange={(event) => { this.handleChange(event) }}
-            onKeyDown={this.handleOnKeyDown}
-          />
+          <InputContainer>
+            <Input
+              id={v}
+              type={v === CONFIRM ? PASSWORD : v}
+              name={v}
+              placeholder={PHMap[v]}
+              onChange={(event) => { this.handleChange(event) }}
+              onKeyDown={this.handleOnKeyDown}
+            />
+            { error[v] ? <ValidationError>{error[v]}</ValidationError> : null }
+          </InputContainer>
         </div>
       )
     })
@@ -157,45 +201,47 @@ class SignUp extends React.Component {
 
   render() {
     return (
-      <Frame>
+      <div>
         <Title>{this.props.title}</Title>
+        { this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null}
         <SignUpSubFrame>
           { this.generateInput() }
-          <SignUpButton
-            type="button"
-            onClick={this.handleOnClick}
-          >
-            {SIGNUP_LABEL}
-          </SignUpButton>
         </SignUpSubFrame>
-        { this.state.validationError ? <div>{this.state.validationError}</div> : null}
-        { this.state.ifSignUpSuccessfully ? <div>{this.props.signUpMessage}</div> : null}
-        { this.state.authErrorMessage ? <div>{this.state.authErrorMessage}</div> : null}
-      </Frame>
+        <CheckBox
+          text={SIGN_UP_CHECK_BOX_LABEL}
+          onToggle={this.onClickCheckBox}
+          checked={this.state.checked}
+        />
+        <SignUpButton type="button" value={SIGNUP_LABEL} name="subscribe" onClick={this.handleOnClick} />
+      </div>
     )
   }
 }
 
 SignUp.defaultProps = {
   apiUrl: '',
-  signUpPath: '',
+  signInPath: '',
   signUpMessage: '',
   title: '',
 }
 
 SignUp.propTypes = {
   apiUrl: PropTypes.string,
-  signUpPath: PropTypes.string,
-  signUpMessage: PropTypes.string,
+  signInPath: PropTypes.string,
   signUp: PropTypes.func.isRequired,
   title: PropTypes.string,
+  router: PropTypes.object.isRequired,
+  redirectPath: PropTypes.string.isRequired,
+  location: PropTypes.object.isRequired,
+  host: React.PropTypes.string.isRequired,
 }
 
 function mapStateToProps(state) {
   return {
     apiUrl: _.get(state, 'authConfigure.apiUrl', ''),
-    signUpPath: _.get(state, 'authConfigure.signUp', ''),
+    signInPath: _.get(state, 'authConfigure.signIn', ''),
+    host: _.get(state, 'authConfigure.host'),
   }
 }
 
-export default connect(mapStateToProps, { signUp: signUpUser, resetAuthError })(SignUp)
+export default connect(mapStateToProps, { signUp: signInUser, resetAuthError })(SignUp)
