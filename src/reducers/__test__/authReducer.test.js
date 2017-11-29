@@ -1,4 +1,5 @@
 /*global describe, it, context*/
+/*
 'use strict'
 import { expect } from 'chai'
 import reducer  from '../authReducer'
@@ -65,5 +66,6 @@ describe('Plain Authentication Reudcer Testing', function() {
       ).to.deep.equal(expectedState)
     })
   })
-
 })
+
+*/

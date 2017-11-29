@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import { GOOGLE_LOGIN } from '../constants/string'
 import { OAuthButoon, IconContainer } from '../components/form-widgets'
+import { colors } from '../styles/common-variables'
 import get from 'lodash/get'
 import GoogleIcon from '../static/google_button_logo.svg'
 import PropTypes from 'prop-types'
@@ -14,17 +15,17 @@ const GoogleButton = OAuthButoon.extend`
   position: relative;
   background-color: white;
   &:link, :active, :visited, :focus {
-    color: #4a4949 !important;
+    color: ${colors.textBlack} !important;
     text-decoration: none;
   }
   margin-bottom: 0;
 `
 
 const Google = (props) => {
-  const { apiUrl, googlePath, location, domain } = props
+  const { apiUrl, googlePath, host, activatePagePath } = props
   return (
     <GoogleButton
-      href={`${apiUrl}${googlePath}?location=${location}&domain=${domain}`}
+      href={`${apiUrl}${googlePath}?destination=${host}/${activatePagePath}`}
     >
       <IconContainer>
         <GoogleIcon />
@@ -39,21 +40,23 @@ Google.defaultProps = {
   googlePath: '',
   location: '',
   domain: '',
+  host: '',
+  destinationPath: '',
+  activatePagePath: '',
 }
 
 Google.propTypes = {
   apiUrl: PropTypes.string,
   googlePath: PropTypes.string,
-  location: PropTypes.string,
-  domain: PropTypes.string,
+  host: PropTypes.string,
+  activatePagePath: PropTypes.string,
 }
 
 function mapStateToProps(state) {
   return {
     apiUrl: _.get(state, 'authConfigure.apiUrl', ''),
     googlePath: _.get(state, 'authConfigure.oAuthProviders.google', ''),
-    location: _.get(state, 'authConfigure.location', ''),
-    domain: _.get(state, 'authConfigure.domain', ''),
+    host: _.get(state, 'authConfigure.host', ''),
   }
 }
 

@@ -1,30 +1,22 @@
 import { connect } from 'react-redux'
 import { forgetPassword } from '../actions/authentication'
+import { INVALID_EMAIL, FP_EMAIL_PLACEHOLDER, UNREGISTERED_ERROR } from '../constants/string'
 import { NormalButton, Input, Title } from '../components/form-widgets'
+import { validateEmail } from '../utils/validateForm'
+import { ValidationError, AuthError, InfoText } from '../components/form-info'
 import get from 'lodash/get'
 import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
-import { INVALID_EMAIL, FP_EMAIL_PLACEHOLDER, FP_SUCCESS } from '../constants/string'
-import { ValidationError, AuthError, CompletionText } from '../components/form-info'
-import { validateEmail } from '../utils/validateForm'
 
 const _ = {
   get,
 }
 
+const BUTTON_TEXT = '傳送'
+
 const LocalTitle = Title.extend`
   margin-bottom: 40px
-`
-
-const InfoText = styled.div`
-  font-size: 15px;
-  font-weight: bold;
-  line-height: 1.53;
-  letter-spacing: 0.6px;
-  text-align: left;
-  color: #4a4949;
-  margin-bottom: 25px;
 `
 
 const InputContainer = styled.div`
@@ -36,12 +28,12 @@ class ForgetPassword extends React.Component {
     super(props)
     this.state = {
       email: '',
-      success: false,
       authError: false,
       invalidEmail: '',
     }
     this.handleChange = this._handleChange.bind(this)
     this.handleOnClick = this._handleOnClick.bind(this)
+    this.handleOnKeyDown = this._handleOnKeyDown.bind(this)
   }
 
   _handleChange(e) {
@@ -61,6 +53,12 @@ class ForgetPassword extends React.Component {
     return true
   }
 
+  _handleOnKeyDown(e) {
+    if (e.which === 13) {
+      this._handleOnClick()
+    }
+  }
+
   _handleOnClick() {
     const { email } = this.state
     const { apiUrl, path } = this.props
@@ -72,14 +70,15 @@ class ForgetPassword extends React.Component {
     this.props.forgetPassword(email, apiUrl, path)
       .then(() => {
         this.setState({
-          success: true,
           authError: '',
           invalidEmail: '',
         })
+        const { router } = this.props
+        router.push('/changepw')
       })
-      .catch((error) => {
+      .catch(() => {
         this.setState({
-          authError: error.message,
+          authError: UNREGISTERED_ERROR,
           invalidEmail: '',
         })
       })
@@ -90,6 +89,7 @@ class ForgetPassword extends React.Component {
     return (
       <div>
         <LocalTitle>{title}</LocalTitle>
+        { this.state.authError ? <AuthError>{this.state.authError}</AuthError> : null }
         <InfoText>{infoText}</InfoText>
         <InputContainer>
           <Input
@@ -107,10 +107,8 @@ class ForgetPassword extends React.Component {
           onClick={this.handleOnClick}
           type="button"
         >
-          傳送
+          {BUTTON_TEXT}
         </NormalButton>
-        { this.state.success ? <CompletionText>{FP_SUCCESS}</CompletionText> : null }
-        { this.state.authError ? <AuthError>{this.state.authError}</AuthError> : null }
       </div>
     )
   }
@@ -130,6 +128,7 @@ ForgetPassword.propTypes = {
   apiUrl: PropTypes.string,
   path: PropTypes.string,
   forgetPassword: PropTypes.func,
+  router: PropTypes.object.isRequired,
 }
 
 const mapStateToProps = (state) => {

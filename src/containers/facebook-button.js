@@ -20,10 +20,10 @@ const FacebookButton = OAuthButoon.extend`
 `
 
 const Facebook = (props) => {
-  const { apiUrl, facebookPath, location, domain } = props
+  const { apiUrl, facebookPath, host, activatePagePath } = props
   return (
     <FacebookButton
-      href={`${apiUrl}${facebookPath}?location=${location}&domain=${domain}`}
+      href={`${apiUrl}${facebookPath}?destination=${host}/${activatePagePath}`}
     >
       <IconContainer>
         <FacebookIcon />
@@ -37,23 +37,22 @@ const Facebook = (props) => {
 Facebook.defaultProps = {
   apiUrl: '',
   facebookPath: '',
-  location: '',
-  domain: '',
+  host: '',
+  activatePagePath: '',
 }
 
 Facebook.propTypes = {
   apiUrl: PropTypes.string,
   facebookPath: PropTypes.string,
-  location: PropTypes.string,
-  domain: PropTypes.string,
+  host: PropTypes.string,
+  activatePagePath: PropTypes.string,
 }
 
 function mapStateToProps(state) {
   return {
     apiUrl: _.get(state, 'authConfigure.apiUrl', ''),
     facebookPath: _.get(state, 'authConfigure.oAuthProviders.facebook', ''),
-    location: _.get(state, 'authConfigure.location', ''),
-    domain: _.get(state, 'authConfigure.domain', ''),
+    host: _.get(state, 'authConfigure.host', ''),
   }
 }
 

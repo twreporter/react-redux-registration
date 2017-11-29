@@ -1,30 +1,27 @@
 // parameters height, width, bg
 /* eslint-disable */
 import styled from 'styled-components'
-import { SignInForm } from '../styles/common-variables'
+import { FORM_WIDTH, WIDGETHEIGHT, colors } from '../styles/common-variables'
 import React from 'react'
 import PropTypes from 'prop-types'
-
-const WIDGETHEIGHT = '55px'
 
 export const Title = styled.p`
   width: 100%;
   text-align: center;
   font-size: 34px;
-  color: #4a4949;
+  color: ${colors.textBlack};
   font-weight: bold;
 `
 
 export const OAuthButoon = styled.a`
   display: block;
   border-style: none;
-  border-radius: 3px;
-  height: ${SignInForm.buttons.height};
+  height: ${WIDGETHEIGHT};
   width:100%;
   margin-bottom: 15px;
   text-decoration: none;
   text-align: center;
-  line-height: ${SignInForm.buttons.height};
+  line-height: ${WIDGETHEIGHT};
   font-size: 14px;
   font-weight: bold;
   letter-spacing: 0.6px;
@@ -35,20 +32,19 @@ export const NormalButtonStyle = (() => {
   return `
     border-style: none;
     width: 137.5px;
-    border-radius: 3px;
     background-color: #a67a44;
-    height: ${SignInForm.buttons.height};
+    height: ${WIDGETHEIGHT};
     margin-bottom: 17px;
     &:hover {
       cursor: pointer
     }
-    color: ${SignInForm.buttons.fontColor};
+    color: ${colors.white};
     outline: none;
   `
 })()
 
 export const NormalButton = styled.button`
-  ${NormalButtonStyle}
+  ${NormalButtonStyle};
 `
 
 export const IconContainer = styled.span`
@@ -75,6 +71,7 @@ const CheckBoxContainer = styled.div`
     padding   : 0;
     font-size : 1em;
     opacity   : 0;
+    cursor: pointer;
   }
 
   input[type=checkbox]:not(old) + label{
@@ -105,6 +102,7 @@ const CheckBoxContainer = styled.div`
   label {
     font-weight: unset;
     margin: 0;
+    cursor: pointer;
   }
 `
 
@@ -117,11 +115,10 @@ export const Input = styled.input`
   height: ${WIDGETHEIGHT};
   box-sizing : border-box;
   border: 1px solid #d8dee2;
-  border-radius: 3px;
   padding-left: 15px;
   font-size: 13px;
   font-weight: bold;
-  color: #4a4949;
+  color: ${colors.textBlack};
   background-color: #e8e8e8;
   &:focus {
     outline: none;
@@ -157,9 +154,9 @@ class CheckBox extends React.Component {
           onChange={this.onToggle}
           checked={checked}
         />
-      <label htmlFor="option">
-        <span><span></span></span>{text}
-       </label>
+        <label htmlFor="option">
+          <span><span></span></span>{text}
+        </label>
       </CheckBoxContainer>
     )
   }
@@ -175,7 +172,7 @@ CheckBox.propTypes = {
 CheckBox.defaultProps = {
   utilColor: '#a67a44',
   fontSize: 13,
-  fontColor: '#4a4949',
+  fontColor: '${colors.textBlack}',
 }
 
 export { CheckBox }

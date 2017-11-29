@@ -1,12 +1,11 @@
 // import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INCONSISTENT_PASSWORD, INVALID_EMAIL, INVALID_PASSWORD, SIGN_UP_CHECK_BOX_LABEL } from '../constants/string'
+import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INVALID_EMAIL, SIGN_UP_CHECK_BOX_LABEL, CONFLICTING_ACCOUNT, DEFAULT_API_ERROR } from '../constants/string'
 import { EMAIL, PASSWORD, CONFIRM } from '../constants/form'
 import { get } from 'lodash'
 import { NormalButtonStyle, Input, InputContainer, CheckBox, Title } from '../components/form-widgets'
-import { SignUpForm } from '../styles/common-variables'
-import { signUpUser, resetAuthError } from '../actions'
-import { validateEmail, validatePassword } from '../utils/validateForm'
+import { signInUser, resetAuthError } from '../actions'
+import { validateEmail } from '../utils/validateForm'
 import { ValidationError, AuthError } from '../components/form-info'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -16,11 +15,10 @@ const _ = {
   get,
 }
 
-const mailChimpURL = '//twreporter.us14.list-manage.com/subscribe/post?u=4da5a7d3b98dbc9fdad009e7e&id=e0eb0c8c32'
-
-const Form = styled.form`
-  width: ${SignUpForm.dimension.width};
-`
+const ACCOUNT_CONFLICT_MSG = 'Account is already signup'
+// This is for original design
+// const INPUT_CONTENT = [EMAIL, PASSWORD, CONFIRM]
+const INPUT_CONTENT = [EMAIL]
 
 const SignUpSubFrame = styled.div`
   width: 100%;
@@ -31,9 +29,11 @@ const SignUpSubFrame = styled.div`
 
 const SignUpButton = styled.input`
   ${NormalButtonStyle};
-  margin: 0;
+  display: block;
+  margin-top: 25px;
 `
 
+/*
 const Policy = styled.div`
   margin-top: 15px;
   margin-bottom: 25px;
@@ -54,25 +54,23 @@ const Policy = styled.div`
   }
 `
 
+<Policy>
+  透過註冊，你同意報導者的<a>條款及細則</a>與<a>隱私政策</a>
+</Policy>
+*/
+
 class SignUp extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       [EMAIL]: '',
-      [PASSWORD]: '',
-      [CONFIRM]: '',
       invalidEmail: '',
-      invalidPassword: '',
-      invalidInconsistentPW: '',
-      ifSignUpSuccessfully: false,
       authErrorMessage: '',
       checked: false,
     }
-    this.form = {}
     this.handleOnClick = this._handleOnClick.bind(this)
     this.handleOnKeyDown = this._handleOnKeyDown.bind(this)
     this.onClickCheckBox = this._onClickCheckBox.bind(this)
-    this.handleSubmit = this._handleSubmit.bind(this)
   }
 
   // In workflow, the redux state will store all auth errors.
@@ -101,47 +99,58 @@ class SignUp extends React.Component {
     })
   }
 
-  _handleOnClick(clickSetState) {
+  _validationCheck(clickSetState) {
     // check validation
     if (!validateEmail(this.state[EMAIL])) {
       clickSetState('invalidEmail', INVALID_EMAIL)
-      return Promise.reject()
+      return false
     }
+    /*
     if (!validatePassword(this.state[PASSWORD])) {
       clickSetState('invalidPassword', INVALID_PASSWORD)
-      return Promise.reject()
+      return false
     }
     if (this.state[PASSWORD] !== this.state[CONFIRM]) {
       clickSetState('invalidInconsistentPW', INCONSISTENT_PASSWORD)
       // return new Promise.Reject(
-      return Promise.reject()
+      return false
     }
-    return this.props.signUp(this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signUpPath)
+    */
+    return true
   }
 
-  _handleSubmit(e) {
-    e.preventDefault()
+  _handleOnClick() {
+    const { location, apiUrl, signInPath, host } = this.props
+    const destinationPath = _.get(location, 'query.destinationPath', '')
     const clickSetState = (key, value) => {
       const defaultInfoState = {
         invalidEmail: '',
-        invalidPassword: '',
         invalidInconsistentPW: '',
         authErrorMessage: '',
-        ifSignUpSuccessfully: false,
       }
       defaultInfoState[key] = value
       this.setState(defaultInfoState)
     }
-    this._handleOnClick(clickSetState)
+    if (!this._validationCheck(clickSetState)) {
+      return
+    }
+    const destination = destinationPath ? `${host}/${destinationPath}` : `${host}`
+    this.props.signUp(this.state[EMAIL], apiUrl, signInPath, destination)
       .then(() => {
-        clickSetState('ifSignUpSuccessfully', true)
-        if (this.state.checked) {
-          this.form.submit()
-        }
+        const { router, redirectPath } = this.props
+        const { checked } = this.state
+        const checkedVlaue = checked ? 'true' : 'false'
+        router.push(`/${redirectPath}?checked=${checkedVlaue}&email=${this.state[EMAIL]}&action=signUp`)
       })
       .catch((errorInfo) => {
         if (errorInfo) {
-          clickSetState('authErrorMessage', errorInfo.message)
+          const errorObj = errorInfo.status
+          const { data, status } = errorObj
+          if (status === 409 && data.message === ACCOUNT_CONFLICT_MSG) {
+            clickSetState('authErrorMessage', CONFLICTING_ACCOUNT)
+          } else {
+            clickSetState('authErrorMessage', DEFAULT_API_ERROR)
+          }
         }
       })
   }
@@ -165,7 +174,7 @@ class SignUp extends React.Component {
       [CONFIRM]: CONFIRM_PLACEHOLDER,
     }
 
-    return [EMAIL, PASSWORD, CONFIRM].map((v) => {
+    return INPUT_CONTENT.map((v) => {
       const { invalidEmail, invalidPassword, invalidInconsistentPW } = this.state
       const error = {
         [EMAIL]: invalidEmail,
@@ -192,16 +201,9 @@ class SignUp extends React.Component {
 
   render() {
     return (
-      <Form
-        action={mailChimpURL}
-        method="post"
-        name="subscribe-form"
-        target="_blank"
-        onSubmit={this.handleSubmit}
-        novalidate
-        innerRef={(node) => { this.form = node }}
-      >
+      <div>
         <Title>{this.props.title}</Title>
+        { this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null}
         <SignUpSubFrame>
           { this.generateInput() }
         </SignUpSubFrame>
@@ -210,37 +212,36 @@ class SignUp extends React.Component {
           onToggle={this.onClickCheckBox}
           checked={this.state.checked}
         />
-        <Policy>
-          透過註冊，你同意報導者的<a>條款及細則</a>與<a>隱私政策</a>
-        </Policy>
-        <SignUpButton type="submit" value={SIGNUP_LABEL} name="subscribe" />
-        { this.state.ifSignUpSuccessfully ? <div>{this.props.signUpMessage}</div> : null}
-        { this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null}
-      </Form>
+        <SignUpButton type="button" value={SIGNUP_LABEL} name="subscribe" onClick={this.handleOnClick} />
+      </div>
     )
   }
 }
 
 SignUp.defaultProps = {
   apiUrl: '',
-  signUpPath: '',
+  signInPath: '',
   signUpMessage: '',
   title: '',
 }
 
 SignUp.propTypes = {
   apiUrl: PropTypes.string,
-  signUpPath: PropTypes.string,
-  signUpMessage: PropTypes.string,
+  signInPath: PropTypes.string,
   signUp: PropTypes.func.isRequired,
   title: PropTypes.string,
+  router: PropTypes.object.isRequired,
+  redirectPath: PropTypes.string.isRequired,
+  location: PropTypes.object.isRequired,
+  host: React.PropTypes.string.isRequired,
 }
 
 function mapStateToProps(state) {
   return {
     apiUrl: _.get(state, 'authConfigure.apiUrl', ''),
-    signUpPath: _.get(state, 'authConfigure.signUp', ''),
+    signInPath: _.get(state, 'authConfigure.signIn', ''),
+    host: _.get(state, 'authConfigure.host'),
   }
 }
 
-export default connect(mapStateToProps, { signUp: signUpUser, resetAuthError })(SignUp)
+export default connect(mapStateToProps, { signUp: signInUser, resetAuthError })(SignUp)

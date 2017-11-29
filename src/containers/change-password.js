@@ -133,6 +133,7 @@ class ChangePassword extends React.Component {
     return (
       <div>
         <LocalTitle>{title}</LocalTitle>
+        {this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null}
         {Inputs}
         <NormalButton
           onClick={this.handleOnClick}
@@ -141,7 +142,6 @@ class ChangePassword extends React.Component {
           確認
         </NormalButton>
         {this.state.success ? <CompletionText>{text}</CompletionText> : null }
-        {this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null}
       </div>
     )
   }

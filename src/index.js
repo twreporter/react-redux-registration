@@ -14,6 +14,7 @@ import * as keys from './config/config'
 import PageContainer from './components/page-container'
 import ForgetPassword from './containers/forget-password'
 import ChangePassword from './containers/change-password'
+import Confirmation from './containers/sign-in-up-confirm'
 
 export {
   ActivePage,
@@ -37,6 +38,7 @@ export {
   PageContainer,
   ForgetPassword,
   ChangePassword,
+  Confirmation,
 }
 
 export default {
@@ -50,6 +52,7 @@ export default {
     PageContainer,
     ForgetPassword,
     ChangePassword,
+    Confirmation,
   },
   reducers: {
     authReducer,

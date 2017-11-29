@@ -73,12 +73,12 @@ export const getErrorInfo = (err) => {
   }
 }
 
-export function signUpUser(email, password, apiUrl, signUpPath) {
+export function signUpUser(email, apiUrl, signUpPath) {
   return (dispatch) => {
     dispatch(authReq(messagesSet.authProcess.signUpReq))
     const axiosInstance = getAxiosInstance()
     return new Promise((resolve, reject) => {
-      axiosInstance.post(`${apiUrl}${signUpPath}`, { email, password })
+      axiosInstance.post(`${apiUrl}${signUpPath}`, { email })
         .then(() => {
           resolve()
         })
@@ -110,15 +110,15 @@ export function activateUser(email, token, apiUrl, activationPath) {
   }
 }
 
-export function signInUser(email, password, apiUrl, signInPath) {
+export function signInUser(email, apiUrl, signInPath, destination) {
   return (dispatch) => {
     dispatch(authReq(messagesSet.authProcess.signInReq))
     return new Promise((resolve, reject) => {
       const axiosInstance = getAxiosInstance()
-      axiosInstance.post(`${apiUrl}${signInPath}`, { email, password })
-        .then((res) => {
-          setupTokenInLocalStorage(res.data, LOCALSTORAGE_KEY_AUTH)
-          dispatch(authUser('account signIn', {}))
+      axiosInstance.post(`${apiUrl}${signInPath}`, { email, destination })
+        .then(() => {
+          // setupTokenInLocalStorage(res.data, LOCALSTORAGE_KEY_AUTH)
+          // dispatch(authUser('account signIn', {}))
           resolve()
         })
         .catch((err) => {
@@ -146,10 +146,10 @@ export function changePassword(email, password, token, apiUrl, path) {
   }
 }
 
-export function authenticateUserByToken(days, curretnAuthType) {
+export function authenticateUserByToken(days, currentAuthType) {
   return (dispatch) => {
     if (!tokenExpirationChecker(days, LOCALSTORAGE_KEY_AUTH)) {
-      const authType = `${curretnAuthType} verified token`
+      const authType = `${currentAuthType} verified token`
       dispatch(writeTokenStatus(messagesSet.token.valid))
       dispatch(authUser(authType, {}))
     } else {

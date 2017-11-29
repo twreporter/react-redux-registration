@@ -1,14 +1,14 @@
-import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, INVALID_EMAIL, INVALID_PASSWORD, SIGN_UP, SIGN_IN_CHECK_BOX_LABEL, RESET_PASSWORD_REDIRECT, API_SIGNIN_ERROR } from '../constants/string'
+import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, INVALID_EMAIL, SIGN_UP, SIGN_IN_CHECK_BOX_LABEL, DEFAULT_API_ERROR } from '../constants/string'
 import { connect } from 'react-redux'
 import { EMAIL, PASSWORD } from '../constants/form'
 import { get } from 'lodash'
 import { Link } from 'react-router'
-import { LOCALSTORAGE_KEY_CHECKED } from '../config/config'
-import { NormalButton, CheckBox, Input, InputContainer, Title } from '../components/form-widgets'
+import { LOCALSTORAGE_KEY_CHECKED, LOCALSTORAGE_KEY_REDIRECT_LOCATION } from '../config/config'
+import { NormalButton, Input, InputContainer, Title, CheckBox } from '../components/form-widgets'
 import { setupTokenInLocalStorage, tokenExpirationChecker } from '../utils/tokenManager'
-import { SignInForm } from '../styles/common-variables'
+import { FORM_WIDTH, colors } from '../styles/common-variables'
 import { signInUser, resetAuthError } from '../actions'
-import { validateEmail, validatePassword } from '../utils/validateForm'
+import { validateEmail } from '../utils/validateForm'
 import { ValidationError, AuthError } from '../components/form-info'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -19,7 +19,7 @@ const _ = {
 }
 
 const Frame = styled.div`
-  width: ${SignInForm.dimension.width};
+  width: ${FORM_WIDTH};
 `
 
 const SigInSubFrame = styled.div`
@@ -39,7 +39,7 @@ const SignUpSubFrame = styled.div`
   font-size: 13px;
 `
 const Division = styled.div`
-  width: ${SignInForm.dimension.width};
+  width: ${FORM_WIDTH};
   position: relative;
   text-align: center;
   height: 12px;
@@ -51,7 +51,7 @@ const DivisionLine = styled.div`
   width: 127px;
   opacity: 0.2;
   height: 2px;
-  background-color: #4a4949;
+  background-color: ${colors.textBlack};
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -72,7 +72,7 @@ const DivisionText = styled.div`
   font-size: 12px;
   letter-spacing: 0.5px;
   text-align: center;
-  color: #4a4949;
+  color: ${colors.textBlack};
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -102,11 +102,11 @@ const LinkStyle = styled.div`
   }
 `
 
-const ForgetPassword = LinkStyle.extend`
-  height: 29px;
-  line-height: 29px;
-  float: right;
-`
+// const ForgetPassword = LinkStyle.extend`
+//   height: 29px;
+//   line-height: 29px;
+//   float: right;
+// `
 
 class SignInPrototype extends React.Component {
   constructor(props) {
@@ -116,7 +116,6 @@ class SignInPrototype extends React.Component {
       [PASSWORD]: '',
       authErrorMessage: '',
       validationErrorEmail: '',
-      validationErrorPassword: '',
       checked: false,
     }
     this.handleOnClick = this._handleOnClick.bind(this)
@@ -142,8 +141,17 @@ class SignInPrototype extends React.Component {
   //   }
   // }
 
+  componentWillMount() {
+    const { ifAuthenticated } = this.props
+    if (ifAuthenticated) {
+      const { router } = this.props
+      router.push('/')
+    }
+  }
+
   componentDidMount() {
-    tokenExpirationChecker(7, LOCALSTORAGE_KEY_CHECKED)
+    const { destinationPath, host } = this.props
+    tokenExpirationChecker(32, LOCALSTORAGE_KEY_CHECKED)
     const checkedInfoString = localStorage.getItem(LOCALSTORAGE_KEY_CHECKED)
     const checkedInfoObj = JSON.parse(checkedInfoString)
     if (checkedInfoObj) {
@@ -152,6 +160,12 @@ class SignInPrototype extends React.Component {
         [EMAIL]: checkedInfoObj.account,
         checked: true,
       })
+    }
+    if (destinationPath) {
+      const bookmarkData = {
+        destination: destinationPath ? `${host}/${destinationPath}` : `${host}`,
+      }
+      localStorage.setItem(LOCALSTORAGE_KEY_REDIRECT_LOCATION, JSON.stringify(bookmarkData))
     }
   }
 
@@ -163,40 +177,50 @@ class SignInPrototype extends React.Component {
     })
   }
 
-  _handleOnClick() {
-    const { signIn, router, signInRedirectPath } = this.props
+  _validation() {
     if (!validateEmail(this.state[EMAIL])) {
       this.setState({
         validationErrorEmail: INVALID_EMAIL,
-        validationErrorPassword: '',
+        authErrorMessage: '',
       })
-      // prevent program run to following statements
-      return
+      return false
     }
+    /*
     if (!validatePassword(this.state[PASSWORD])) {
       this.setState({
         validationErrorEmail: '',
         validationErrorPassword: INVALID_PASSWORD,
       })
+      return false
+    }
+    */
+    return true
+  }
+
+  _handleOnClick() {
+    const { signIn, router, signInRedirectPath, apiUrl, signInPath, host, destinationPath } = this.props
+
+    if (!this._validation()) {
       return
     }
+
     if (this.state.checked) {
       setupTokenInLocalStorage({ account: this.state[EMAIL] }, LOCALSTORAGE_KEY_CHECKED)
     } else {
       localStorage.removeItem(LOCALSTORAGE_KEY_CHECKED)
     }
+
     this.setState({
       validationErrorEmail: '',
-      validationErrorPassword: '',
     }, () => {
-      signIn(this.state[EMAIL], this.state[PASSWORD], this.props.apiUrl, this.props.signInPath)
+      const destination = destinationPath ? `${host}/${destinationPath}` : `${host}`
+      signIn(this.state[EMAIL], apiUrl, signInPath, destination)
         .then(() => {
-          router.push(signInRedirectPath)
+          router.push(`/${signInRedirectPath}?checked=false&action=signIn&email=${this.state[EMAIL]}`)
         })
         .catch(() => {
-          // const errorMsg = _.get(error, 'message', 'default error!')
           this.setState({
-            authErrorMessage: API_SIGNIN_ERROR,
+            authErrorMessage: DEFAULT_API_ERROR,
           })
         })
     })
@@ -226,7 +250,7 @@ class SignInPrototype extends React.Component {
       [PASSWORD]: this.state.validationErrorPassword,
     }
 
-    return [EMAIL, PASSWORD].map((v) => {
+    return [EMAIL].map((v) => {
       return (
         <div key={v}>
           <InputContainer>
@@ -246,7 +270,7 @@ class SignInPrototype extends React.Component {
     })
   }
   render() {
-    const { title } = this.props
+    const { title, destinationPath } = this.props
     const signInArea = (() => {
       return (
         <SigInSubFrame>
@@ -263,6 +287,7 @@ class SignInPrototype extends React.Component {
               : null
           }
           <div>
+            { this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null }
             { this.generateInput() }
             <UtilFrame>
               <CheckBox
@@ -270,11 +295,13 @@ class SignInPrototype extends React.Component {
                 onToggle={this.onClickCheckBox}
                 checked={this.state.checked}
               />
+              {/*
               <ForgetPassword>
                 <Link to="/forgetpw">
                   {RESET_PASSWORD_REDIRECT}
                 </Link>
               </ForgetPassword>
+              */}
             </UtilFrame>
             <SignInButton
               onClick={this.handleOnClick}
@@ -287,10 +314,11 @@ class SignInPrototype extends React.Component {
       )
     })()
     const signUpArea = (() => {
+      const toUrl = destinationPath ? `/signup?destinationPath=${destinationPath}` : '/signup'
       return (
         <SignUpSubFrame>
           <span>{`${SIGN_UP.plainText}`}&nbsp;</span>
-          <LinkStyle><Link to="/signup">{`${SIGN_UP.linkText}`}</Link></LinkStyle>
+          <LinkStyle><Link to={toUrl}>{`${SIGN_UP.linkText}`}</Link></LinkStyle>
         </SignUpSubFrame>
       )
     })()
@@ -299,7 +327,6 @@ class SignInPrototype extends React.Component {
       return (
         <div>
           <Title>{`${title}`}</Title>
-          { this.state.authErrorMessage ? <AuthError>{this.state.authErrorMessage}</AuthError> : null }
           {signInArea}
           {signUpArea}
         </div>
@@ -309,10 +336,12 @@ class SignInPrototype extends React.Component {
     const formWrapper = (() => {
       return <Frame>{Form}</Frame>
     })()
-
-    return (
-      <div>{formWrapper}</div>
-    )
+    if (!this.props.ifAuthenticated) {
+      return (
+        <div>{formWrapper}</div>
+      )
+    }
+    return null
   }
 }
 
@@ -323,6 +352,8 @@ SignInPrototype.defaultProps = {
   title: '',
   signInRedirectPath: '',
   children: null,
+  ifAuthenticated: false,
+  destinationPath: '',
 }
 
 SignInPrototype.propTypes = {
@@ -336,12 +367,17 @@ SignInPrototype.propTypes = {
     React.PropTypes.arrayOf(React.PropTypes.node),
     React.PropTypes.node,
   ]),
+  ifAuthenticated: React.PropTypes.bool,
+  host: React.PropTypes.string.isRequired,
+  destinationPath: React.PropTypes.string,
 }
 
 function mapStateToProps(state) {
   return {
     apiUrl: _.get(state, 'authConfigure.apiUrl', ''),
     signInPath: _.get(state, 'authConfigure.signIn', ''),
+    ifAuthenticated: _.get(state, 'auth.authenticated', false),
+    host: _.get(state, 'authConfigure.host'),
   }
 }
 

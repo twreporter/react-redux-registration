@@ -1,6 +1,5 @@
 import React from 'react'
 import SignInPrototype from './sign-in-prototype'
-import { withRouter } from 'react-router'
 
 const SignInReact = (props) => {
   return (
@@ -11,4 +10,4 @@ const SignInReact = (props) => {
 }
 
 
-export default withRouter(SignInReact)
+export default SignInReact

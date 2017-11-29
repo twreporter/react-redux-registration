@@ -9,6 +9,7 @@ export const messagesSet = {
   },
   authError: {
     tokenMsg: 'the token has expired or unvalid token',
+    signUpErrMsg: 'Account already signed up',
   },
   token: {
     valid: 'Valid Token',
