@@ -363,13 +363,13 @@ SignInPrototype.propTypes = {
   title: PropTypes.string,
   router: PropTypes.object.isRequired,
   signInRedirectPath: PropTypes.string,
-  children: React.PropTypes.oneOfType([
-    React.PropTypes.arrayOf(React.PropTypes.node),
-    React.PropTypes.node,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
   ]),
-  ifAuthenticated: React.PropTypes.bool,
-  host: React.PropTypes.string.isRequired,
-  destinationPath: React.PropTypes.string,
+  ifAuthenticated: PropTypes.bool,
+  host: PropTypes.string.isRequired,
+  destinationPath: PropTypes.string,
 }
 
 function mapStateToProps(state) {
