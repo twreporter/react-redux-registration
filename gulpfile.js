@@ -25,7 +25,7 @@ let customerFolder = process.env.CUSTOMER_FOLDER
 if (typeof customerFolder !== 'string') {
   customerFolder = path.resolve(__dirname, '../twreporter-react')
 }
-const destFolder = `${customerFolder}/node_modules/twreporter-registration/lib`
+const destFolder = `${customerFolder}/node_modules/@twreporter/registration/lib`
 
 gulp.task(
   'clean-customer-folder',
