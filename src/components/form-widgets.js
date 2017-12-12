@@ -11,6 +11,7 @@ export const Title = styled.p`
   font-size: 34px;
   color: ${colors.textBlack};
   font-weight: bold;
+  margin-bottom: 30px;
 `
 
 export const OAuthButoon = styled.a`

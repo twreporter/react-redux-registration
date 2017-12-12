@@ -233,7 +233,7 @@ SignUp.propTypes = {
   router: PropTypes.object.isRequired,
   redirectPath: PropTypes.string.isRequired,
   location: PropTypes.object.isRequired,
-  host: React.PropTypes.string.isRequired,
+  host: PropTypes.string.isRequired,
 }
 
 function mapStateToProps(state) {
