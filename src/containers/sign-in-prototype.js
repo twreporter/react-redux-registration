@@ -1,7 +1,6 @@
 import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, INVALID_EMAIL, SIGN_UP, SIGN_IN_CHECK_BOX_LABEL, DEFAULT_API_ERROR } from '../constants/string'
 import { connect } from 'react-redux'
 import { EMAIL, PASSWORD } from '../constants/form'
-import { get } from 'lodash'
 import { Link } from 'react-router'
 import { LOCALSTORAGE_KEY_CHECKED, LOCALSTORAGE_KEY_REDIRECT_LOCATION } from '../config/config'
 import { NormalButton, Input, InputContainer, Title, CheckBox } from '../components/form-widgets'
@@ -12,6 +11,7 @@ import { validateEmail } from '../utils/validateForm'
 import { ValidationError, AuthError } from '../components/form-info'
 import PropTypes from 'prop-types'
 import React from 'react'
+import get from 'lodash/get'
 import styled from 'styled-components'
 
 const _ = {

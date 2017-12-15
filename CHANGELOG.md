@@ -1,5 +1,8 @@
 ### Unrelease
 
+### 2.0.2
+- Do not import all lodash. Import lodash function we need only.
+
 ### 2.0.1
 - Fix React warning and styling change
 
