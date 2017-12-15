@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
-import { get } from 'lodash'
+import get from 'lodash/get'
 
 const _ = {
   get,

@@ -2,7 +2,6 @@
 import { connect } from 'react-redux'
 import { EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER, CONFIRM_PLACEHOLDER, SIGNUP_LABEL, INVALID_EMAIL, SIGN_UP_CHECK_BOX_LABEL, CONFLICTING_ACCOUNT, DEFAULT_API_ERROR } from '../constants/string'
 import { EMAIL, PASSWORD, CONFIRM } from '../constants/form'
-import { get } from 'lodash'
 import { NormalButtonStyle, Input, InputContainer, CheckBox, Title } from '../components/form-widgets'
 import { signInUser, resetAuthError } from '../actions'
 import { validateEmail } from '../utils/validateForm'
@@ -10,6 +9,7 @@ import { ValidationError, AuthError } from '../components/form-info'
 import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
+import get from 'lodash/get'
 
 const _ = {
   get,
