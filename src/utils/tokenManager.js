@@ -4,6 +4,15 @@ const _ = {
   get,
 }
 
+let tokenRenewalTimeout
+
+const daysToSecs = (days) => {
+  if (typeof days === 'number') {
+    return days * 24 * 60 * 60 * 1000
+  }
+  return 6 * 24 * 60 * 60 * 1000
+}
+
 function ObjToString(obj) {
   if (obj) {
     return JSON.stringify(obj)
@@ -44,10 +53,24 @@ export function setupTokenInLocalStorage(setting, key) {
 }
 
 /**
+* @param {object} key - localStorage key
+*/
+
+export function getItem(key) {
+  return localStorageExist((ls) => {
+    if (ls) {
+      return ls.getItem(key)
+    }
+    return ''
+  })
+}
+
+/**
 * @param {array} setting - contain string key
 */
 
 export function removeToken(key) {
+  clearInterval(tokenRenewalTimeout)
   localStorageExist((ls) => {
     if (ls) {
       ls.removeItem(key)
@@ -62,7 +85,7 @@ export function tokenExpirationChecker(days, key) {
     const setupTime = _.get(lsInfoObj, 'setupTime')
     if (setupTime) {
       const now = new Date().getTime()
-      if (now - setupTime > days * 24 * 60 * 60 * 1000) {
+      if (now - setupTime > daysToSecs(days)) {
         removeToken(key)
         return true
       }
@@ -70,4 +93,10 @@ export function tokenExpirationChecker(days, key) {
     }
     return true
   })
+}
+
+export function scheduleRenewToken(days, cb) {
+  tokenRenewalTimeout = setInterval(() => {
+    cb()
+  }, daysToSecs(days))
 }

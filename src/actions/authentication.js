@@ -1,15 +1,23 @@
-import axios from 'axios'
-import get from 'lodash/get'
 import { AUTH_USER, UNAUTH_USER, AUTH_ERROR, AUTH_REQ, DELETE_AUTHINFO, WRITE_TOKEN_STATUS, RESET_AUTH_ERROR } from './types'
+import { LOCALSTORAGE_KEY_AUTH } from '../config/config'
 import { messagesSet } from '../constants/messageSet'
 import { setupTokenInLocalStorage, removeToken, tokenExpirationChecker } from '../utils/tokenManager'
-import { LOCALSTORAGE_KEY_AUTH } from '../config/config'
+import axios from 'axios'
+import get from 'lodash/get'
 
 const _ = {
   get,
 }
 
-const getAxiosInstance = () => {
+const getAxiosInstance = (token) => {
+  if (token) {
+    return axios.create({
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+  }
   return axios.create({
     headers: { 'Content-Type': 'application/json' },
   })
@@ -156,5 +164,26 @@ export function authenticateUserByToken(days, currentAuthType) {
       dispatch(writeTokenStatus(messagesSet.token.invalid))
       dispatch(signOutUser())
     }
+  }
+}
+
+export function renewToken(apiUrl, path, authObj) {
+  return (dispatch) => {
+    dispatch(authReq(messagesSet.authProcess.renewToken))
+    const userId = _.get(authObj, 'id', '')
+    const jwt = _.get(authObj, 'jwt', '')
+    const axiosInstance = getAxiosInstance(jwt)
+    return axiosInstance.get(`${apiUrl}${path}/${userId}`)
+      .then((res) => {
+        const newToken = _.get(res, 'data.data.token', '')
+        if (newToken) {
+          const newAuthObj = { ...authObj, jwt: newToken }
+          setupTokenInLocalStorage(newAuthObj, LOCALSTORAGE_KEY_AUTH)
+        }
+      })
+      .catch((err) => {
+        const errorInfo = getErrorInfo(err)
+        dispatch(authError(errorInfo))
+      })
   }
 }
