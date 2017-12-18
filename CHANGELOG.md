@@ -1,5 +1,8 @@
 ### Unrelease
 
+### 2.1.0
+- Clean up dependencies and Upgrade peer dependencies. Accept react@^16.0.0.
+
 ### 2.0.2
 - Do not import all lodash. Import lodash function we need only.
 
