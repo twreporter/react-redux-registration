@@ -1,5 +1,8 @@
 ### Unrelease
 
+### 2.1.1
+- Modify peerDependencies to accept react@^15.0.0
+
 ### 2.1.0
 - Clean up dependencies and Upgrade peer dependencies. Accept react@^16.0.0.
 
