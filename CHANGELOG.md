@@ -1,5 +1,8 @@
 ### Unrelease
 
+### 2.1.5
+- Rasterize facebook_button_logo.svg file
+
 ### 2.1.4
 - Update default time interval of scheduleRenewToken
 
