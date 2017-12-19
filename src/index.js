@@ -7,9 +7,9 @@ import FacebookButton from './containers/facebook-button'
 import GoogleButton from './containers/google-button'
 import authReducer from './reducers/authReducer'
 import configureReducer from './reducers/configure'
-import { configure as configureAction, authUser as authUserAction, signOutUser as signOutAction, deletAuthInfo as deletAuthInfoAction, authenticateUserByToken as authUserByTokenAction } from './actions'
+import { configure as configureAction, authUser as authUserAction, signOutUser as signOutAction, deletAuthInfo as deletAuthInfoAction, authenticateUserByToken as authUserByTokenAction, renewToken } from './actions'
 import { authInfoStringToObj } from './utils/responseConverter'
-import { setupTokenInLocalStorage, tokenExpirationChecker } from './utils/tokenManager'
+import { setupTokenInLocalStorage, tokenExpirationChecker, getItem, scheduleRenewToken } from './utils/tokenManager'
 import * as keys from './config/config'
 import PageContainer from './components/page-container'
 import ForgetPassword from './containers/forget-password'
@@ -34,11 +34,14 @@ export {
   authInfoStringToObj,
   setupTokenInLocalStorage,
   tokenExpirationChecker,
+  getItem,
   keys,
   PageContainer,
   ForgetPassword,
   ChangePassword,
   Confirmation,
+  renewToken,
+  scheduleRenewToken,
 }
 
 export default {
@@ -64,11 +67,14 @@ export default {
     signOutAction,
     deletAuthInfoAction,
     authUserByTokenAction,
+    renewToken,
   },
   utils: {
     authInfoStringToObj,
     setupTokenInLocalStorage,
     tokenExpirationChecker,
+    getItem,
+    scheduleRenewToken,
   },
   keys,
 }

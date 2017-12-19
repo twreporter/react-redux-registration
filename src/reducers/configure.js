@@ -20,6 +20,7 @@ const initialState = {
   signUp: '',
   signIn: '',
   activate: '',
+  renewToken: '',
   bookmarkUpdate: '',
   bookmarkDelete: '',
   bookmarkGet: '',

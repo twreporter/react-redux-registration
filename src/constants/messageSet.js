@@ -6,6 +6,7 @@ export const messagesSet = {
     authUser: 'User is authenticated successfully',
     unauthUser: 'User signed out',
     forgetpassword: 'forget password email request',
+    renewToken: 'New Token Request',
   },
   authError: {
     tokenMsg: 'the token has expired or unvalid token',

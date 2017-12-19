@@ -1,7 +1,13 @@
 ### Unrelease
 
+### 2.1.4
+- Update default time interval of scheduleRenewToken
+
+### 2.1.3
+- Add renew token action
+
 ### 2.1.2
-- Reduce the bundle size by only importing the module we need. 
+- Reduce the bundle size by only importing the module we need.
 
 ### 2.1.1
 - Modify peerDependencies to accept react@^15.0.0

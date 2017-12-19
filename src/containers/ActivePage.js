@@ -1,9 +1,10 @@
-import { activateUser } from '../actions'
+import { activateUser, renewToken } from '../actions'
 import { connect } from 'react-redux'
 import { DEFAULT_API_ERROR } from '../constants/string'
 import { FORM_WIDTH } from '../styles/common-variables'
 import { InfoText } from '../components/form-info'
-import { LOCALSTORAGE_KEY_REDIRECT_LOCATION } from '../config/config'
+import { LOCALSTORAGE_KEY_REDIRECT_LOCATION, LOCALSTORAGE_KEY_AUTH } from '../config/config'
+import { scheduleRenewToken, getItem } from '../utils/tokenManager'
 import { Title } from '../components/form-widgets'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -33,7 +34,7 @@ class ActivePage extends React.PureComponent {
     }
   }
   componentDidMount() {
-    const { location, activate, router, destination, errorOccurs } = this.props
+    const { apiUrl, location, activate, router, destination, errorOccurs, renewPath, renewTokenAction } = this.props
     const email = _.get(location, 'query.email', '')
     const token = _.get(location, 'query.token', '')
     const redirectLocation = localStorage.getItem(LOCALSTORAGE_KEY_REDIRECT_LOCATION)
@@ -41,8 +42,19 @@ class ActivePage extends React.PureComponent {
     localStorage.removeItem(LOCALSTORAGE_KEY_REDIRECT_LOCATION)
     // account activation
     if (token) {
-      activate(email, token, this.props.apiUrl, this.props.activationPath)
+      activate(email, token, apiUrl, this.props.activationPath)
         .then(() => {
+          const authInfoString = getItem(LOCALSTORAGE_KEY_AUTH)
+          if (authInfoString) {
+            scheduleRenewToken(
+              6,
+              () => {
+                if (getItem(LOCALSTORAGE_KEY_AUTH)) {
+                  renewTokenAction(apiUrl, renewPath, JSON.parse(getItem(LOCALSTORAGE_KEY_AUTH)))
+                }
+              },
+            )
+          }
           if (destination) {
             const destObj = url.parse(destination)
             const path = _.get(destObj, 'pathname', '/')
@@ -103,6 +115,7 @@ ActivePage.defaultProps = {
   nextRouter: {},
   apiUrl: '',
   activationPath: '',
+  renewTokenAction: () => {},
 }
 
 ActivePage.propTypes = {
@@ -113,13 +126,16 @@ ActivePage.propTypes = {
   activationPath: PropTypes.string,
   router: PropTypes.object.isRequired,
   errorOccurs: PropTypes.func.isRequired,
+  renewPath: PropTypes.string.isRequired,
+  renewTokenAction: PropTypes.func,
 }
 
 function mapStateToProps(state) {
   return {
     apiUrl: _.get(state, 'authConfigure.apiUrl', ''),
+    renewPath: _.get(state, 'authConfigure.renew', ''),
     activationPath: _.get(state, 'authConfigure.activate', ''),
   }
 }
 
-export default connect(mapStateToProps, { activate: activateUser })(ActivePage)
+export default connect(mapStateToProps, { activate: activateUser, renewTokenAction: renewToken })(ActivePage)
