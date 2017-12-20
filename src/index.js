@@ -1,4 +1,4 @@
-import { configure as configureAction, authUser as authUserAction, signOutUser as signOutAction, deletAuthInfo as deletAuthInfoAction, authenticateUserByToken as authUserByTokenAction, renewToken } from './actions'
+import { configure as configureAction, authUser as authUserAction, signOutUser as signOutAction, deletAuthInfo as deletAuthInfoAction, authenticateUserByToken as authUserByTokenAction, renewToken, createBookmark, getBookmarks, getCurrentBookmark, deleteBookmark } from './actions'
 import { setupTokenInLocalStorage, tokenExpirationChecker, getItem, scheduleRenewToken } from './utils/tokenManager'
 import { localStorageKeys } from './config/config'
 import ActivePage from './containers/active-page'
@@ -13,6 +13,8 @@ import GoogleButton from './containers/google-button'
 import PageContainer from './components/page-container'
 import SignInForm from './containers/sign-in'
 import SignUpForm from './containers/sign-up'
+import bookmarkReducer from './reducers/bookmarks'
+import BookmarkWidget from './containers/bookmark-prototype'
 
 export {
   ActivePage,
@@ -38,6 +40,12 @@ export {
   Confirmation,
   renewToken,
   scheduleRenewToken,
+  bookmarkReducer,
+  createBookmark,
+  getBookmarks,
+  getCurrentBookmark,
+  deleteBookmark,
+  BookmarkWidget,
 }
 
 export default {
@@ -52,10 +60,12 @@ export default {
     ForgetPassword,
     ChangePassword,
     Confirmation,
+    BookmarkWidget,
   },
   reducers: {
     authReducer,
     configureReducer,
+    bookmarkReducer,
   },
   actions: {
     configureAction,
@@ -64,6 +74,10 @@ export default {
     deletAuthInfoAction,
     authUserByTokenAction,
     renewToken,
+    createBookmark,
+    getBookmarks,
+    getCurrentBookmark,
+    deleteBookmark,
   },
   utils: {
     setupTokenInLocalStorage,
