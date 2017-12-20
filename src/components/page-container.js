@@ -1,8 +1,9 @@
+import { dimension } from '../styles/common-variables'
+import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
-import { mediaScreen } from '../styles/style-utils'
-import { FORM_WIDTH } from '../styles/common-variables'
-import PropTypes from 'prop-types'
+
+const { formWidth } = dimension
 
 const Page = styled.div`
   min-height: 666px;
@@ -13,7 +14,7 @@ const Page = styled.div`
 `
 
 const Container = styled.div`
-  width: ${FORM_WIDTH};
+  width: ${formWidth};
 `
 
 const PageContainer = ({ children }) => {

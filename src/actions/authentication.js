@@ -1,5 +1,5 @@
 import { AUTH_USER, UNAUTH_USER, AUTH_ERROR, AUTH_REQ, DELETE_AUTHINFO, WRITE_TOKEN_STATUS, RESET_AUTH_ERROR } from './types'
-import { LOCALSTORAGE_KEY_AUTH } from '../config/config'
+import { localStorageKeys } from '../config/config'
 import { messagesSet } from '../constants/messageSet'
 import { setupTokenInLocalStorage, removeToken, tokenExpirationChecker } from '../utils/tokenManager'
 import axios from 'axios'
@@ -8,6 +8,8 @@ import get from 'lodash/get'
 const _ = {
   get,
 }
+
+const { authInfo } = localStorageKeys
 
 const getAxiosInstance = (token) => {
   if (token) {
@@ -50,15 +52,15 @@ export function authReq(inProcess) {
   }
 }
 
-export function authUser(authType, authInfo) {
+export function authUser(authType, authInfoData) {
   return {
     type: AUTH_USER,
-    payload: { authProcess: messagesSet.authProcess.authUser, authType, authInfo },
+    payload: { authProcess: messagesSet.authProcess.authUser, authType, authInfoData },
   }
 }
 
 export function signOutUser() {
-  removeToken(LOCALSTORAGE_KEY_AUTH)
+  removeToken(authInfo)
   return {
     type: UNAUTH_USER,
     payload: { authProcess: messagesSet.authProcess.unauthUser },
@@ -106,7 +108,7 @@ export function activateUser(email, token, apiUrl, activationPath) {
       const axiosInstance = getAxiosInstance()
       axiosInstance.get(`${apiUrl}${activationPath}?email=${email}&token=${token}`)
         .then((res) => {
-          setupTokenInLocalStorage(res.data, LOCALSTORAGE_KEY_AUTH)
+          setupTokenInLocalStorage(res.data, authInfo)
           dispatch(authUser('account signUp/activate', {}))
           resolve()
         })
@@ -125,7 +127,7 @@ export function signInUser(email, apiUrl, signInPath, destination) {
       const axiosInstance = getAxiosInstance()
       axiosInstance.post(`${apiUrl}${signInPath}`, { email, destination })
         .then(() => {
-          // setupTokenInLocalStorage(res.data, LOCALSTORAGE_KEY_AUTH)
+          // setupTokenInLocalStorage(res.data, authInfo)
           // dispatch(authUser('account signIn', {}))
           resolve()
         })
@@ -156,7 +158,7 @@ export function changePassword(email, password, token, apiUrl, path) {
 
 export function authenticateUserByToken(days, currentAuthType) {
   return (dispatch) => {
-    if (!tokenExpirationChecker(days, LOCALSTORAGE_KEY_AUTH)) {
+    if (!tokenExpirationChecker(days, authInfo)) {
       const authType = `${currentAuthType} verified token`
       dispatch(writeTokenStatus(messagesSet.token.valid))
       dispatch(authUser(authType, {}))
@@ -178,7 +180,7 @@ export function renewToken(apiUrl, path, authObj) {
         const newToken = _.get(res, 'data.data.token', '')
         if (newToken) {
           const newAuthObj = { ...authObj, jwt: newToken }
-          setupTokenInLocalStorage(newAuthObj, LOCALSTORAGE_KEY_AUTH)
+          setupTokenInLocalStorage(newAuthObj, authInfo)
         }
       })
       .catch((err) => {

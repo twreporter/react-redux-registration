@@ -1,14 +1,14 @@
 import { activateUser, renewToken } from '../actions'
 import { connect } from 'react-redux'
 import { DEFAULT_API_ERROR } from '../constants/string'
-import { FORM_WIDTH } from '../styles/common-variables'
+import { dimension } from '../styles/common-variables'
 import { InfoText } from '../components/form-info'
-import { LOCALSTORAGE_KEY_REDIRECT_LOCATION, LOCALSTORAGE_KEY_AUTH } from '../config/config'
+import { localStorageKeys } from '../config/config'
 import { scheduleRenewToken, getItem } from '../utils/tokenManager'
 import { Title } from '../components/form-widgets'
+import get from 'lodash/get'
 import PropTypes from 'prop-types'
 import React from 'react'
-import get from 'lodash/get'
 import styled from 'styled-components'
 import url from 'url'
 
@@ -16,8 +16,11 @@ const _ = {
   get,
 }
 
+const { authInfo, redirectLocation } = localStorageKeys
+const { formWidth } = dimension
+
 const Container = styled.div`
-  width: ${FORM_WIDTH};
+  width: ${formWidth};
 `
 
 const LocalInfoText = InfoText.extend`
@@ -37,20 +40,20 @@ class ActivePage extends React.PureComponent {
     const { apiUrl, location, activate, router, destination, errorOccurs, renewPath, renewTokenAction } = this.props
     const email = _.get(location, 'query.email', '')
     const token = _.get(location, 'query.token', '')
-    const redirectLocation = localStorage.getItem(LOCALSTORAGE_KEY_REDIRECT_LOCATION)
-    const redirectLocationObj = JSON.parse(redirectLocation)
-    localStorage.removeItem(LOCALSTORAGE_KEY_REDIRECT_LOCATION)
+    const redirectLocationString = localStorage.getItem(redirectLocation)
+    const redirectLocationObj = JSON.parse(redirectLocationString)
+    localStorage.removeItem(redirectLocation)
     // account activation
     if (token) {
       activate(email, token, apiUrl, this.props.activationPath)
         .then(() => {
-          const authInfoString = getItem(LOCALSTORAGE_KEY_AUTH)
+          const authInfoString = getItem(authInfo)
           if (authInfoString) {
             scheduleRenewToken(
               6,
               () => {
-                if (getItem(LOCALSTORAGE_KEY_AUTH)) {
-                  renewTokenAction(apiUrl, renewPath, JSON.parse(getItem(LOCALSTORAGE_KEY_AUTH)))
+                if (getItem(authInfo)) {
+                  renewTokenAction(apiUrl, renewPath, JSON.parse(getItem(authInfo)))
                 }
               },
             )

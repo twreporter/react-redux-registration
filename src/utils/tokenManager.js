@@ -6,6 +6,8 @@ const _ = {
 
 let tokenRenewalTimeout
 
+// Internal Usage
+
 const daysToSecs = (days) => {
   if (typeof days === 'number') {
     return days * 24 * 60 * 60 * 1000
@@ -34,6 +36,8 @@ function localStorageExist(callback) {
   }
   return null
 }
+
+// External Usage
 
 /**
 * @param {object} setting - inside obj should be key value pair for localStorage

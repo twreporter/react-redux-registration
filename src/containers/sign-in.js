@@ -1,10 +1,10 @@
 import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, INVALID_EMAIL, SIGN_UP, SIGN_IN_CHECK_BOX_LABEL, DEFAULT_API_ERROR } from '../constants/string'
 import { connect } from 'react-redux'
 import { EMAIL, PASSWORD } from '../constants/form'
-import { LOCALSTORAGE_KEY_CHECKED, LOCALSTORAGE_KEY_REDIRECT_LOCATION } from '../config/config'
+import { localStorageKeys } from '../config/config'
 import { NormalButton, Input, InputContainer, Title, CheckBox } from '../components/form-widgets'
 import { setupTokenInLocalStorage, tokenExpirationChecker } from '../utils/tokenManager'
-import { FORM_WIDTH, colors } from '../styles/common-variables'
+import { dimension, colors } from '../styles/common-variables'
 import { signInUser, resetAuthError } from '../actions'
 import { validateEmail } from '../utils/validateForm'
 import { ValidationError, AuthError } from '../components/form-info'
@@ -18,8 +18,11 @@ const _ = {
   get,
 }
 
+const { checkedInfo, redirectLocation } = localStorageKeys
+const { formWidth } = dimension
+
 const Frame = styled.div`
-  width: ${FORM_WIDTH};
+  width: ${formWidth};
 `
 
 const SigInSubFrame = styled.div`
@@ -39,7 +42,7 @@ const SignUpSubFrame = styled.div`
   font-size: 13px;
 `
 const Division = styled.div`
-  width: ${FORM_WIDTH};
+  width: ${formWidth};
   position: relative;
   text-align: center;
   height: 12px;
@@ -151,8 +154,8 @@ class SignInPrototype extends React.Component {
 
   componentDidMount() {
     const { destinationPath, host } = this.props
-    tokenExpirationChecker(32, LOCALSTORAGE_KEY_CHECKED)
-    const checkedInfoString = localStorage.getItem(LOCALSTORAGE_KEY_CHECKED)
+    tokenExpirationChecker(32, checkedInfo)
+    const checkedInfoString = localStorage.getItem(checkedInfo)
     const checkedInfoObj = JSON.parse(checkedInfoString)
     if (checkedInfoObj) {
       // eslint-disable-next-line react/no-did-mount-set-state
@@ -165,7 +168,7 @@ class SignInPrototype extends React.Component {
       const bookmarkData = {
         destination: destinationPath ? `${host}/${destinationPath}` : `${host}`,
       }
-      localStorage.setItem(LOCALSTORAGE_KEY_REDIRECT_LOCATION, JSON.stringify(bookmarkData))
+      localStorage.setItem(redirectLocation, JSON.stringify(bookmarkData))
     }
   }
 
@@ -205,9 +208,9 @@ class SignInPrototype extends React.Component {
     }
 
     if (this.state.checked) {
-      setupTokenInLocalStorage({ account: this.state[EMAIL] }, LOCALSTORAGE_KEY_CHECKED)
+      setupTokenInLocalStorage({ account: this.state[EMAIL] }, checkedInfo)
     } else {
-      localStorage.removeItem(LOCALSTORAGE_KEY_CHECKED)
+      localStorage.removeItem(checkedInfo)
     }
 
     this.setState({

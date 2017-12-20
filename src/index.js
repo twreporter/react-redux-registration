@@ -1,25 +1,22 @@
-import ActivePage from './containers/ActivePage'
-import AuthenticationScreen from './containers/AuthScreen'
-import NextSignInForm from './containers/sign-in-next'
-import SignInForm from './containers/sign-in-react'
-import SignUpForm from './containers/sign-up'
-import FacebookButton from './containers/facebook-button'
-import GoogleButton from './containers/google-button'
-import authReducer from './reducers/authReducer'
-import configureReducer from './reducers/configure'
 import { configure as configureAction, authUser as authUserAction, signOutUser as signOutAction, deletAuthInfo as deletAuthInfoAction, authenticateUserByToken as authUserByTokenAction, renewToken } from './actions'
-import { authInfoStringToObj } from './utils/responseConverter'
 import { setupTokenInLocalStorage, tokenExpirationChecker, getItem, scheduleRenewToken } from './utils/tokenManager'
-import * as keys from './config/config'
-import PageContainer from './components/page-container'
-import ForgetPassword from './containers/forget-password'
+import { localStorageKeys } from './config/config'
+import ActivePage from './containers/active-page'
+import AuthenticationScreen from './containers/auth-screen'
+import authReducer from './reducers/authReducer'
 import ChangePassword from './containers/change-password'
+import configureReducer from './reducers/configure'
 import Confirmation from './containers/sign-in-up-confirm'
+import FacebookButton from './containers/facebook-button'
+import ForgetPassword from './containers/forget-password'
+import GoogleButton from './containers/google-button'
+import PageContainer from './components/page-container'
+import SignInForm from './containers/sign-in'
+import SignUpForm from './containers/sign-up'
 
 export {
   ActivePage,
   AuthenticationScreen,
-  NextSignInForm,
   SignInForm,
   SignUpForm,
   FacebookButton,
@@ -31,11 +28,10 @@ export {
   signOutAction,
   deletAuthInfoAction,
   authUserByTokenAction,
-  authInfoStringToObj,
   setupTokenInLocalStorage,
   tokenExpirationChecker,
   getItem,
-  keys,
+  localStorageKeys,
   PageContainer,
   ForgetPassword,
   ChangePassword,
@@ -70,11 +66,10 @@ export default {
     renewToken,
   },
   utils: {
-    authInfoStringToObj,
     setupTokenInLocalStorage,
     tokenExpirationChecker,
     getItem,
     scheduleRenewToken,
   },
-  keys,
+  localStorageKeys,
 }

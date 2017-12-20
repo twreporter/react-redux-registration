@@ -14,5 +14,7 @@ export const colors = {
   textBlack: '#4a4949',
 }
 
-export const FORM_WIDTH = '275px'
-export const WIDGETHEIGHT = '55px'
+export const dimension = {
+  formWidth: '275px',
+  widgetHeight: '55px',
+}
