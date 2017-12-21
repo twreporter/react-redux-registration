@@ -15,6 +15,7 @@ import SignInForm from './containers/sign-in'
 import SignUpForm from './containers/sign-up'
 import bookmarkReducer from './reducers/bookmarks'
 import BookmarkWidget from './containers/bookmark-prototype'
+import Bookmark from './components/bookmark'
 
 export {
   ActivePage,
@@ -46,6 +47,7 @@ export {
   getCurrentBookmark,
   deleteBookmark,
   BookmarkWidget,
+  Bookmark,
 }
 
 export default {
@@ -61,6 +63,7 @@ export default {
     ChangePassword,
     Confirmation,
     BookmarkWidget,
+    Bookmark,
   },
   reducers: {
     authReducer,

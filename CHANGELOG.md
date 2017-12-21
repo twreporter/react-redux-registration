@@ -2,6 +2,7 @@
 - Remove redundance
 - Add bookmarks related actions/reducers from @twreporter/redux
 - Add bookmark functional icons from twreporter-react(main website) and export it as widget. ( The icons are fully functional )
+- Get bookmark (bookmark card in bookmark list) from @twreporter/react-components.
 
 
 ### 2.1.5
