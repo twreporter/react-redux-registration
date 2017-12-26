@@ -38,6 +38,7 @@ export const colors = {
   bookmarkTextGrey: '#3e3f3f',
   greyishBrown: '#4a4a4a',
   hoverRed: '#99000a',
+  iconAltText: '#e60013',
 }
 
 export const dimension = {

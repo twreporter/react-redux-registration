@@ -1,4 +1,3 @@
-// LocalStorage keys
 export const localStorageKeys = {
   authInfo: 'authInfo',
   checkedInfo: 'checkedInfo',
@@ -24,10 +23,10 @@ export const storage = {
   },
 }
 
-
 export const mainSite = {
   url: 'https://www.twreporter.org',
 }
-// export const LOCALSTORAGE_KEY_AUTH = 'authInfo'
-// export const LOCALSTORAGE_KEY_CHECKED = 'checkedInfo'
-// export const LOCALSTORAGE_KEY_REDIRECT_LOCATION = 'redirectLocation'
+
+export const appConfig = {
+  host: process.env.NODE_ENV === 'production' ? 'https://www.twreporter.org' : 'http://testtest.twreporter.org:3000',
+}

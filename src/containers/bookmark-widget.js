@@ -1,14 +1,15 @@
+import { appConfig } from '../config/config'
+import { connect } from 'react-redux'
+import { createBookmark, deleteBookmark, getCurrentBookmark } from '../actions/bookmarks'
+import BookmarkAddedIconDesktop from '../static/added-bookmark-desktop.svg'
+import BookmarkAddedIconMobile from '../static/added-bookmark-mobile.svg'
+import BookmarkUnaddedIconDesktop from '../static/add-bookmark-desktop.svg'
+import BookmarkUnaddedIconMobile from '../static/add-bookmark-mobile.svg'
+import browserHistory from 'react-router/lib/browserHistory'
+import get from 'lodash/get'
+import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components'
-import BookmarkAddedIconMobile from '../static/added-bookmark-mobile.svg'
-import BookmarkUnaddedIconMobile from '../static/add-bookmark-mobile.svg'
-import BookmarkAddedIconDesktop from '../static/added-bookmark-desktop.svg'
-import BookmarkUnaddedIconDesktop from '../static/add-bookmark-desktop.svg'
-import browserHistory from 'react-router/lib/browserHistory'
-import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
-import { createBookmark, deleteBookmark, getCurrentBookmark } from '../actions/bookmarks'
-import get from 'lodash/get'
 
 const _ = {
   get,
@@ -19,7 +20,7 @@ const buttonWidth = 52
 const buttonHeight = 52
 
 
-const IconContainer = styled.div`
+const MobileIconContainer = styled.div`
   position: relative;
   border-radius: 50%;
   width: ${buttonWidth}px;
@@ -41,15 +42,22 @@ const BookmarkImg = styled.div`
 `
 
 // Desktop
-
-const ToolFrame = styled.div`
-  box-sizing: border-box;
-  margin-top: 10px;
-`
-
-const BookmarkFrame = ToolFrame.extend`
+const DesktopIconContainer = styled.div`
   cursor: pointer;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
   position: relative;
+  ${(props) => {
+    if (props.svgColor !== '') {
+      return `
+        path {
+          fill: ${props.svgColor};
+        }
+      `
+    }
+    return ''
+  }};
 `
 
 const BookmarkImgDesktop = styled.div`
@@ -144,7 +152,7 @@ class BookmarkPrototype extends React.Component {
    * If user is not authenticated, it will lead user to sign in page
    */
   async _toCreateBookmark() {
-    const { apiUrl, userPath, bookmarkPath, bookmarkData, host, slug } = this.props
+    const { apiUrl, userPath, bookmarkPath, bookmarkData, host, slug, external } = this.props
     if (!slug) {
       return
     }
@@ -168,6 +176,10 @@ class BookmarkPrototype extends React.Component {
       const type = bookmarkData.style === 'interactive' ? 'i' : 'a'
       const webStatus = _.get(error, 'response.status')
       if (webStatus === 401) {
+        if (external) {
+          window.open(`${appConfig.host}/signin/?path=${type}/${slug}`)
+          return
+        }
         browserHistory.push(`/signin/?path=${type}/${slug}`)
       }
     }
@@ -182,31 +194,38 @@ class BookmarkPrototype extends React.Component {
 
   render() {
     const { isBookmarked } = this.state
-    const { mobile } = this.state
+    const { mobile, svgColor } = this.props
     if (mobile) {
       return (
-        <IconContainer onClick={this.handleOnClickBookmark}>
+        <MobileIconContainer onClick={this.handleOnClickBookmark}>
           <BookmarkImg showUp={!isBookmarked}>
             <BookmarkUnaddedIconMobile />
           </BookmarkImg>
           <BookmarkImg showUp={isBookmarked}>
             <BookmarkAddedIconMobile />
           </BookmarkImg>
-        </IconContainer>
+        </MobileIconContainer>
       )
     }
     return (
-      <BookmarkFrame onClick={this.handleOnClickBookmark}>
+      <DesktopIconContainer onClick={this.handleOnClickBookmark} svgColor={svgColor}>
         <BookmarkImgDesktop showUp={!isBookmarked}>
           <BookmarkUnaddedIconDesktop />
         </BookmarkImgDesktop>
         <BookmarkImgDesktop showUp={isBookmarked}>
           <BookmarkAddedIconDesktop />
         </BookmarkImgDesktop>
-      </BookmarkFrame>
+      </DesktopIconContainer>
     )
   }
 }
+
+BookmarkPrototype.defaultProps = {
+  external: false,
+  mobile: false,
+  svgColor: '',
+}
+
 
 BookmarkPrototype.propTypes = {
   slug: PropTypes.string.isRequired,
@@ -217,7 +236,18 @@ BookmarkPrototype.propTypes = {
   userPath: PropTypes.string.isRequired,
   bookmarkPath: PropTypes.string.isRequired,
   host: PropTypes.string.isRequired,
-  bookmarkData: PropTypes.object.isRequired,
+  bookmarkData: PropTypes.shape({
+    slug: PropTypes.string,
+    style: PropTypes.string,
+    title: PropTypes.string,
+    desc: PropTypes.string,
+    thumbnail: PropTypes.string,
+    category: PropTypes.string,
+    published_date: PropTypes.string,
+  }).isRequired,
+  external: PropTypes.bool,
+  mobile: PropTypes.bool,
+  svgColor: PropTypes.string,
 }
 
 function mapStateToProps(state) {

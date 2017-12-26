@@ -14,8 +14,9 @@ import PageContainer from './components/page-container'
 import SignInForm from './containers/sign-in'
 import SignUpForm from './containers/sign-up'
 import bookmarkReducer from './reducers/bookmarks'
-import BookmarkWidget from './containers/bookmark-prototype'
+import BookmarkWidget from './containers/bookmark-widget'
 import Bookmark from './components/bookmark'
+import ServiceWidgets from './containers/service-widgets'
 
 export {
   ActivePage,
@@ -48,6 +49,7 @@ export {
   deleteBookmark,
   BookmarkWidget,
   Bookmark,
+  ServiceWidgets,
 }
 
 export default {
@@ -62,7 +64,6 @@ export default {
     ForgetPassword,
     ChangePassword,
     Confirmation,
-    BookmarkWidget,
     Bookmark,
   },
   reducers: {
@@ -87,6 +88,10 @@ export default {
     tokenExpirationChecker,
     getItem,
     scheduleRenewToken,
+  },
+  widgets: {
+    ServiceWidgets,
+    BookmarkWidget,
   },
   localStorageKeys,
 }
