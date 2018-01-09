@@ -39,6 +39,12 @@ const MobileIconContainer = styled.div`
 const BookmarkImg = styled.div`
   opacity: ${props => (props.showUp ? 1 : 0)};
   transition: opacity 200ms linear;
+  > svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 `
 
 // Desktop
