@@ -1,5 +1,5 @@
 import { AUTH_USER, UNAUTH_USER, AUTH_ERROR, AUTH_REQ, DELETE_AUTHINFO, WRITE_TOKEN_STATUS, RESET_AUTH_ERROR } from './types'
-import { localStorageKeys } from '../config/config'
+import { localStorageKeys } from '../config'
 import { messagesSet } from '../constants/messageSet'
 import { setupTokenInLocalStorage, removeToken, tokenExpirationChecker } from '../utils/tokenManager'
 import axios from 'axios'

@@ -1,5 +1,5 @@
 /* global __DEVELOPMENT__ */
-import { storage, mainSite } from '../config/config'
+import { storage, mainSite } from '../config'
 
 export function replaceStorageUrlPrefix(url = '', isDev = __DEVELOPMENT__) {
   if (isDev || typeof url !== 'string') {

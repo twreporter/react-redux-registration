@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import get from 'lodash/get'
-import { localStorageKeys } from '../config/config'
+import { localStorageKeys } from '../config'
 
 const _ = {
   get,

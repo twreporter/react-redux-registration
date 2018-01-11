@@ -1,7 +1,7 @@
 import { ACCOUNT_LABEL, PASSWORD_LABEL, SIGN_IN, INVALID_EMAIL, SIGN_UP, SIGN_IN_CHECK_BOX_LABEL, DEFAULT_API_ERROR } from '../constants/string'
 import { connect } from 'react-redux'
 import { EMAIL, PASSWORD } from '../constants/form'
-import { localStorageKeys } from '../config/config'
+import { localStorageKeys } from '../config'
 import { NormalButton, Input, InputContainer, Title, CheckBox } from '../components/form-widgets'
 import { setupTokenInLocalStorage, tokenExpirationChecker } from '../utils/tokenManager'
 import { dimension, colors } from '../styles/common-variables'

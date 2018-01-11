@@ -1,4 +1,4 @@
-import { appConfig } from '../config/config'
+import { appConfig } from '../config'
 import { connect } from 'react-redux'
 import { createBookmark, deleteBookmark, getCurrentBookmark } from '../actions/bookmarks'
 import BookmarkAddedIconDesktop from '../static/added-bookmark-desktop.svg'

@@ -1,6 +1,6 @@
 import { colors, font } from '../styles/common-variables'
 import { date2yyyymmdd } from '../utils/date-to-ymd'
-import { linkPrefix } from '../config/config'
+import { linkPrefix } from '../config'
 import { media, mediaScreen, truncate } from '../styles/style-utils'
 import BookmarkIcon from '../static/bookmark.svg'
 import get from 'lodash/get'

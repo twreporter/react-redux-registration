@@ -1,6 +1,6 @@
 import { configure as configureAction, authUser as authUserAction, signOutUser as signOutAction, deletAuthInfo as deletAuthInfoAction, authenticateUserByToken as authUserByTokenAction, renewToken, createBookmark, getBookmarks, getCurrentBookmark, deleteBookmark } from './actions'
 import { setupTokenInLocalStorage, tokenExpirationChecker, getItem, scheduleRenewToken } from './utils/tokenManager'
-import { localStorageKeys } from './config/config'
+import { localStorageKeys } from './config'
 import ActivePage from './containers/active-page'
 import AuthenticationScreen from './containers/auth-screen'
 import authReducer from './reducers/authReducer'

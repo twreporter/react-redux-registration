@@ -1,4 +1,4 @@
-import { appConfig } from '../config/config'
+import { appConfig } from '../config'
 import { connect } from 'react-redux'
 import { signOutUser } from '../actions/authentication'
 import get from 'lodash/get'
