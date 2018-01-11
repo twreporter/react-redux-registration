@@ -8,28 +8,42 @@
   3. react-router
   4. express server
 
-* Note(deprecated): The package work with [next.js](https://github.com/zeit/next.js)
-
 
 ## Installation
 ```bash
-npm i --save twreporter-registration
+npm i --save @twreporter/registration
 ```
 
+## Main Features
+1. Registration System
+2. Service/Bookmark widgets
 
 ## Work Flow
-### Sign Up Account
-1. User sign up
-2. API obtain data and inform database to add new account.
-3. API send activation email to registered account.
-  * email link contain authorized token and user's email address.
-4. User click customized link and activate account.
-5. API return authorized info and the app store(action) info in localStorage.
+### Overview
+* 2 mechanisms
+ 1. oAuth
+ 2. twreporter account
 
-### Sig In with TWReporter(TWR) Account
-1. User Sign in.
-2. API obtain data, send request to database.
-3. API return auth info. The app store(action) info in localStroage.
+* 2 scenarios
+ 1. User signin/up at registration page
+ 2. User want to bookmark page without signing in.
+
+* The internal data process is same, no matter user sign in or sign up
+* In either way (oAuth/twreporter account), user will browse activation page to be redirected to destination.
+
+### Sign In/Up twreporter account
+* Start at Sign In page
+ 1. Sign In
+ 2. Redirect to confirm page
+ 3. User get email and click the url
+ 4. Go to activation page
+
+* Start at article page
+ 1. Click Bookmark
+ 2. Redirect to Sign In page (At the time, url contain with query path)
+ 3. User signIn and get email. (Store path into localStorage)
+ 4. User Click url to activation page
+ 5. Activation page get path from localStorage and redirect user back to article page
 
 ### Sign In with oAuth(Facebook, Google)
 1. User Sign in.
@@ -41,226 +55,208 @@ npm i --save twreporter-registration
   2. redux state
   3. local storage
 
+## Registration
 
-## Usage js
-
-
-### [React-Router](https://github.com/ReactTraining/react-router) Setting
-  * If user can't pass AuthScreen, the app will be rediected automatically according to the provided redirectPath.
-
-```js
-import SignIn from '../containers/SignIn'
-import SignUp from '../containers/SignUp'
-import Activation from '../containers/Activation'
-import Features from '../containers/features'
-import AuthenticationScreen from 'twreporter-registration'
-
-export default function (history = browserHistory) {
-  return (
-    <Router history={history} onUpdate={scrollAndFireTracking} >
-      <Route path="/topics/:slug" component={TopicLandingPage} />
-      <Route path="/" component={Home} />
-      <Route path="/" component={App}>
-        <Route path="signup" component={SignUp} />
-        <Route path="signin" component={SignIn} />
-        <Route path="activate" component={Activation} />
-        <Route path="features" component={AuthenticationScreen(Features)} redirectPath={'/signin'} />
-      </Route>
-    </Router>
-  )
-}
-```
-
-### Sign Up
-```js
-import React from 'react'
-import { connect } from 'react-redux'
-import { SignUpForm } from 'twreporter-registration'
-
-const SignUp = (props) => (
-  <SignUpForm
-    title='title'
-    signUpMessage='signUpMessage'
-    {...props}
-  />
-)
-
-export default connect()(SignUp)
-```
-
-
-### Sign In
-```js
-import React from 'react'
-import { connect } from 'react-redux'
-import { SignInForm, FacebookButton, GoogleButton } from 'twreporter-registration'
-
-const SignIn = (props) => (
-  <SignInForm
-    title={'title'}
-    signInRedirectPath = {'/'}
-    defaultStyle={true}
-    {...props}
-  >
-    <FacebookButton />
-    <GoogleButton />
-  </SignInForm>
-)
-
-export default connect()(SignIn)
-```
-
-### Sign Out
-  * Sign out action will remove localStorage auth info and change redux state
-```js
-import { Link } from 'react-router'
-import { signOutAction } from 'twreporter-registration'
-
-<Link to={`/${memberConfigs.path}`} onClick={() => {signOutAction()}}>
-  <div>Click here to sign out</div>
-</Link>
-```
-
-
-
-### Activation
-```js
-import React from 'react'
-import { ActivePage } from 'twreporter-registration'
-import { browserHistory } from 'react-router'
-import { connect } from 'react-redux'
-
-const Activation = (props) => (
-  <div>
-    <ActivePage
-      activateRedirectPath={'/'}
-      browserHistory={browserHistory}
-      {...props}
-    />
-  </div>
-)
-
-```
-
-### React Reducer
-```js
-import { authReducer, configureReducer } from 'twreporter-registration'
-
-const registrationInitialState = {
-  apiUrl: '',
-  signUp: '',
-  signIn: '',
-  activate: '',
-  oAuthProviders: {
-    google: '',
-    facebook: ''
-  },
-  location: '',
-  domain: '',
-}
-const ConfigureReducer = configureReducer(registrationInitialState)
-
-const rootReducer = combineReducers({
-  authConfigure: ConfigureReducer,
-  auth: authReducer,
-})
-
-export default rootReducer
-```
-
-### Server Side
-  * obtain oAuth data from cookie and pass it to redux state.
-  * setup authentication api server url, path(endpoints).
+### Server - [server.js](https://github.com/twreporter/twreporter-react/blob/master/src/server.js)
+1. Set up configuration for registration
+2. Process cookie in oAuth procedure
 
 ```js
-import cookieParser from 'cookie-parser'
-import { configureAction, authUserAction, authInfoStringToObj } from 'twreporter-registration'
+import { configureAction, authUserAction } from '@twreporter/registration'
 
-server.use(cookieParser())
-
-// The following procedure is for OAuth (Google/Facebook)
-// setup token to redux state from cookies
-if (req.query.login) {
-  const authType = req.query.login
-  const cookies = req.cookies
-  const authInfoString = cookies.auth_info
-  const authInfoObj = authInfoStringToObj(authInfoString)
-  store.dispatch(authUserAction(authType, authInfoObj))
+if (path === `/${ACTIVATE_PAGE_PATH}`) {
+  // The following procedure is for OAuth (Google/Facebook)
+  // setup token to redux state from cookies
+  const authInfoString = get(req, 'cookies.auth_info', '')
+  const authType = get(req, 'query.login', 'email signin')
+  if (authInfoString) {
+    const authInfoObj = JSON.parse(authInfoString)
+    const jwt = get(authInfoObj, 'jwt', '')
+    if (jwt) {
+      store.dispatch(authUserAction(authType, authInfoObj))
+    }
+  }
 }
 // setup authentication api server url and endpoints
-const registrationConfigure = {
-  apiUrl: 'http://localhost:8080',
-  signUp: '/v1/signup',
-  signIn: '/v1/login',
-  activate: '/v1/activate',
-  oAuthProviders: {
-    google: '/v1/auth/google',
-    facebook: '/v1/auth/facebook'
-  },
-  location: 'http://testtest.twreporter.org:3000',
-  domain: 'twreporter.org'
-}
-store.dispatch(configureAction(registrationConfigure))
+store.dispatch(configureAction(config.registrationConfigure))
 ```
 
-
-### Enter Point of the Project
-  * TWR Ex: src/index.js
-
+### Entry point of application - [App.js](https://github.com/twreporter/twreporter-react/blob/master/src/containers/App.js)
 ```js
-import { setupTokenInLocalStorage, deletAuthInfoAction, authUserByTokenAction } from 'twreporter-registration'
+// token can be stored in localStorage in two scenario
+// 1. TWReporter account sign in
+// 2. oAuth
+// Acount: store auth info during signin action
+// oAuth: cookie -> redux state -> localStorage -> delete authinfo in redux state
+// The following procedure is only for oAuth
+// const { auth } = store.getState()
+const { ifAuthenticated, authInfo, authType, deletAuthInfoAction } = this.props
+if(ifAuthenticated && authInfo && (authType === 'facebook' || authType === 'google')) {
+  setupTokenInLocalStorage(authInfo, localStorageKeys.authInfo)
+  deletAuthInfoAction()
+  // store.dispatch(deletAuthInfoAction())
+}
+
+// 1. Renew token when user brows our website
+// 2. ScheduleRenewToken if user keep the tab open forever
+const { authConfigure, renewToken } = this.props
+const authInfoString = getItem(localStorageKeys.authInfo)
+if(authInfoString) {
+  const authObj = JSON.parse(authInfoString)
+  // const { authConfigure } = store.getState()
+  const { apiUrl, renew } = authConfigure
+  renewToken(apiUrl, renew, authObj)
+  scheduleRenewToken(
+    6,
+    () => {
+      if (getItem(localStorageKeys.authInfo)) {
+        renewToken(apiUrl, renew, JSON.parse(getItem(localStorageKeys.authInfo)))
+      }
+    }
+  )
+}
 
 // Check if token existed in localStorage and expired
-// token can be stored in localStorage in two scenario
-// 1. oAuth
-// 2. TWReporter account sign in
-const { auth } = store.getState()
-if(auth.authenticated && auth.authInfo && (auth.authType=== 'facebook' || auth.authType==='google')) {
-  setupTokenInLocalStorage(auth.authInfo)
-  store.dispatch(deletAuthInfoAction())
-}
-
+// following preocedure is for both accoutn and oAuth SignIn
 // 7 = 7 days
-store.dispatch(authUserByTokenAction(7, auth.authType))
-  .then(() => {})
-  .catch(() => {})
+const { authUserByTokenAction } = this.props
+authUserByTokenAction(7, authType)
 ```
 
+### [Sign In Page](https://github.com/twreporter/twreporter-react/blob/master/src/containers/sign-in.js)
+### [Sign Up Page](https://github.com/twreporter/twreporter-react/blob/master/src/containers/sign-up.js)
+### [Activation](https://github.com/twreporter/twreporter-react/blob/master/src/containers/Activation.js)
 
+## Widget
+The package provide two kind of widgets. One is bookmark widget, another one is service widgets. Each widget can be served on specific url, so you can use iframe to implement the function.
 
-## Next.js Example
+### Data Structure
 
 ```js
-class SignIn extends React.Component {
-  static getInitialProps ({ store }) {
-    const registrationConfigure = {
-      apiUrl: 'http://testtest.twreporter.org:8080',
-      signUp: '/v1/signup',
-      signIn: '/v1/login',
-      activate: '/v1/activate',
-      oAuthProviders: {
-        google: '/v1/auth/google',
-        facebook: '/v1/auth/facebook'
-      },
-      location: 'http://testtest.twreporter.org:3000',
-      domain: 'twreporter.org'
+// Bookmark
+const bookmarkData = {
+  slug: 'fake-slug',
+  host: 'http://fake-host:3000',
+  is_external: false,
+  title: 'fake-title',
+  desc: 'fake-description',
+  thumbnail: 'fake-thumbnail',
+  category: 'issue',
+  published_date: '2017-12-12T08:00:00+08:00',
+}
+
+const bookmarkPostMessage = {
+  bookmarkData,
+  svgColor: 'white',
+}
+
+// Service
+const bookmarkPostMessage = {
+  svgColor: 'white',
+}
+
+```
+
+### Usage
+* Create Receiver Component which use imported WidgetFrame from this package.( which is iframe)
+  * Receiver Component is equivalent to iframe Service Provider
+* Create iFrame in the application page.
+
+#### Service Provider
+```js
+//Receiver Prototype
+const isJson = (string) => {
+  try {
+    JSON.parse(string)
+  } catch (e) {
+    return false
+  }
+  return true
+}
+
+class WidgetPrototype extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      postMessage: {}
     }
-    store.dispatch(configureAction(registrationConfigure))
+    this.receiveMessage = this._receiveMessage.bind(this)
+  }
+
+  _receiveMessage(event) {
+    // The statement is only for production
+    // Only receiveMessage from twreporter website
+    if (event.origin !== 'https://www.twreporter.org' && process.env.NODE_ENV === 'production') {
+      return
+    }
+    let dataObject
+    // Only process message which contain useful infomation
+    const data = _.get(event, 'data', '')
+    if (typeof data === 'string' && isJson(data)) {
+      dataObject = JSON.parse(event.data)
+      this.setState({
+        postMessage: dataObject
+      })
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('message', this.receiveMessage, false)
+  }
+}
+
+export default WidgetPrototype
+```
+
+```js
+// Receiver page
+// User can use the url for iframe
+import { BookmarkWidget } from '@twreporter/registration'
+import get from 'lodash/get'
+import React from 'react'
+import WidgetPrototype from './prototype'
+
+const _ = {
+  get
+}
+
+
+class BookmarkIframe extends WidgetPrototype {
+  render() {
+    const { postMessage } = this.state
+    return (
+      <BookmarkWidget
+        slug={_.get(postMessage, 'bookmarkData.slug', '')}
+        bookmarkData={_.get(postMessage, 'bookmarkData', {})}
+        svgColor={_.get(postMessage, 'svgColor', '')}
+        external
+        mobile
+      />
+    )
+  }
+}
+
+export default BookmarkIframe
+```
+
+#### Application
+
+```js
+class foo extends React.Component {
+  componentDidMount() {
+    const serviceElement = document.getElementById('serviceIcon')
+    serviceElement.onload = () => {
+      serviceElement.contentWindow.postMessage(JSON.stringify(servicePostMessage), `${HOST}`)
+    }
   }
 
   render() {
     return (
-      <SignInForm
-        title={'Sign In to Newsletter'}
-        browserHistory={Router}
-        AssignedLink={Link}
-        signInRedirectPath={'/features'}
-        location={'http://testtest.twreporter.org:3000/features'}
-        domain={'twreporter.org'}
-        account={false}
-        facebook={true}
-        google={true}
-        defaultStyle={false}
+      <iFrame
+        id="serviceIcon"
+        title="service-widget"
+        src={`${HOST}/widgets-services`}
+        scrolling="no"
       />
     )
   }
@@ -269,16 +265,11 @@ class SignIn extends React.Component {
 
 ## Development
 ```bash
-npm run dev   //development mode
-npm run build //production mode
+npm run dev    //development mode
+npm run build  //production mode
 
 //Hard reload development without npm link
-CUSTOMER_FOLDER=/Users/hanReporter/Documents/twReporter_frontEnd/twreporter-react npm run dev
+CUSTOMER_FOLDER=/task/xxfolder/twreporter npm run dev
+
+//Or you can put @twreporter/registration at same directory with your project folder.
 ```
-
-* advice for developer/programmer:
-You can program in es2015 + es2017 and only need to edit files in **src** directory.
-All files will be transpiled through babel-preset-es2017 and transferred to **lib** directory.
-
-* TO DO
-create next version of active page

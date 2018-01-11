@@ -1,4 +1,13 @@
 ### Unrelease
+- Remove redundance
+- Add bookmarks related actions/reducers from @twreporter/redux
+- Add bookmark functional icons from twreporter-react(main website) and export it as widget. ( The icons are fully functional )
+- Get bookmark (bookmark card in bookmark list) from @twreporter/react-components.
+- Provide widget service.
+- Provide customized widget color.
+- Update auth screen to work with new auth process in main website
+- (Auth process) from client.js to App.js
+
 
 ### 2.1.5
 - Rasterize facebook_button_logo.svg file

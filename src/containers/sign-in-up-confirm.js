@@ -1,4 +1,4 @@
-import { FORM_WIDTH } from '../styles/common-variables'
+import { dimension } from '../styles/common-variables'
 import { InfoText } from '../components/form-info'
 import { Title, NormalButton } from '../components/form-widgets'
 import get from 'lodash/get'
@@ -13,7 +13,7 @@ const _ = {
 // to keep up with mailchimp machenism, the input need to be named as 'EMAIL'
 const mailChimpURL = '//twreporter.us14.list-manage.com/subscribe/post?u=4da5a7d3b98dbc9fdad009e7e&id=e0eb0c8c32'
 const Form = styled.form`
-  width: ${FORM_WIDTH};
+  width: ${dimension.formWidth};
 `
 
 const genInfoText = (action, email, checked) => {

@@ -1,9 +1,11 @@
 // parameters height, width, bg
 /* eslint-disable */
-import styled from 'styled-components'
-import { FORM_WIDTH, WIDGETHEIGHT, colors } from '../styles/common-variables'
-import React from 'react'
+import { dimension, colors } from '../styles/common-variables'
 import PropTypes from 'prop-types'
+import React from 'react'
+import styled from 'styled-components'
+
+const { widgetHeight } = dimension
 
 export const Title = styled.p`
   width: 100%;
@@ -17,12 +19,12 @@ export const Title = styled.p`
 export const OAuthButoon = styled.a`
   display: block;
   border-style: none;
-  height: ${WIDGETHEIGHT};
+  height: ${widgetHeight};
   width:100%;
   margin-bottom: 15px;
   text-decoration: none;
   text-align: center;
-  line-height: ${WIDGETHEIGHT};
+  line-height: ${widgetHeight};
   font-size: 14px;
   font-weight: bold;
   letter-spacing: 0.6px;
@@ -34,7 +36,7 @@ export const NormalButtonStyle = (() => {
     border-style: none;
     width: 137.5px;
     background-color: #a67a44;
-    height: ${WIDGETHEIGHT};
+    height: ${widgetHeight};
     margin-bottom: 17px;
     &:hover {
       cursor: pointer
@@ -113,7 +115,7 @@ export const InputContainer = styled.div`
 
 export const Input = styled.input`
   width:100%;
-  height: ${WIDGETHEIGHT};
+  height: ${widgetHeight};
   box-sizing : border-box;
   border: 1px solid #d8dee2;
   padding-left: 15px;

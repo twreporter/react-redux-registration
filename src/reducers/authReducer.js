@@ -35,8 +35,8 @@ export default function (state = initialState, action) {
       return { ...state, authProcess }
     }
     case AUTH_USER: {
-      const { authProcess, authType, authInfo } = action.payload
-      return { ...state, authenticated: true, authProcess, authType, authInfo }
+      const { authProcess, authType, authInfoData } = action.payload
+      return { ...state, authenticated: true, authProcess, authType, authInfo: authInfoData }
     }
     case UNAUTH_USER: {
       const { authProcess } = action.payload

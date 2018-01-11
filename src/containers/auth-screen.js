@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import get from 'lodash/get'
+import { localStorageKeys } from '../config'
 
 const _ = {
   get,
@@ -9,14 +10,16 @@ const _ = {
 
 export default (ComposedComponent) => {
   class AuthenticationScreen extends React.Component {
-    componentWillMount() {
-      if (!this.props.authenticated) {
+    componentDidMount() {
+      const authInfo = localStorage.getItem(localStorageKeys.authInfo) || ''
+      if (!this.props.authenticated && authInfo === '') {
         this.context.router.push(this.props.route.redirectPath)
       }
     }
 
     componentWillUpdate() {
-      if (!this.props.authenticated) {
+      const authInfo = localStorage.getItem(localStorageKeys.authInfo) || ''
+      if (!this.props.authenticated && authInfo === '') {
         this.context.router.push(this.props.route.redirectPath)
       }
     }
