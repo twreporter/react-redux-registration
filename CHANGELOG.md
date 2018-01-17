@@ -1,4 +1,6 @@
 ### Unrelease
+
+### 2.2.0
 - Remove redundance
 - Add bookmarks related actions/reducers from @twreporter/redux
 - Add bookmark functional icons from twreporter-react(main website) and export it as widget. ( The icons are fully functional )
