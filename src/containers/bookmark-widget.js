@@ -105,7 +105,9 @@ class BookmarkPrototype extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.checkIsBookmarked(_.get(nextProps, 'slug'))
+    if (_.get(this.props, 'slug') !== _.get(nextProps, 'slug')) {
+      this.checkIsBookmarked(_.get(nextProps, 'slug'))
+    }
   }
 
   /**
