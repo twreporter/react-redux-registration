@@ -1,5 +1,8 @@
 ### Unrelease
 
+### 2.2.1
+- Stop sending bookmark checking request if the post slug is not changed
+
 ### 2.2.0
 - Remove redundance
 - Add bookmarks related actions/reducers from @twreporter/redux
