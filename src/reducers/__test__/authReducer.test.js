@@ -1,4 +1,4 @@
-/*global describe, it, context*/
+/* global describe, it, context */
 /*
 'use strict'
 import { expect } from 'chai'
