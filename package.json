@@ -1,6 +1,6 @@
 {
   "name": "@twreporter/registration",
-  "version": "2.1.5",
+  "version": "2.2.0",
   "description": "account registration system ",
   "main": "lib/index.js",
   "scripts": {
