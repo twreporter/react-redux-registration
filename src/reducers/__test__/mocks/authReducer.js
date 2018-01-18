@@ -3,26 +3,26 @@ import * as types from '../../../actions/types'
 export const mockActionSet = {
   [types.AUTH_REQ]: {
     type: types.AUTH_REQ,
-    payload: 'mock authentication request'
+    payload: 'mock authentication request',
   },
   [types.AUTH_USER]: {
     type: types.AUTH_USER,
-    payload: 'mock autherizing user'
+    payload: 'mock autherizing user',
   },
   [types.UNAUTH_USER]: {
     type: types.UNAUTH_USER,
-    payload: 'mock unauthorizing user'
+    payload: 'mock unauthorizing user',
   },
   [types.AUTH_ERROR]: {
     type: types.AUTH_ERROR,
     payload: {
       webStatus: 401,
-      errorMessages: 'mock error message'
-    }
+      errorMessages: 'mock error message',
+    },
   },
   [types.FETCH_MESSAGE]: {
     type: types.FETCH_MESSAGE,
-    payload: 'mock fetching message'
+    payload: 'mock fetching message',
   },
 }
 
@@ -31,7 +31,7 @@ export const mockExpStateSet = {
   initialState: {
     authError: {
       errorMessages: '',
-      webStatus: null
+      webStatus: null,
     },
     messages: '',
     authenticated: false,
@@ -40,7 +40,7 @@ export const mockExpStateSet = {
   authReq: {
     authError: {
       errorMessages: '',
-      webStatus: null
+      webStatus: null,
     },
     messages: '',
     authenticated: false,
@@ -49,7 +49,7 @@ export const mockExpStateSet = {
   authUser: {
     authError: {
       errorMessages: '',
-      webStatus: null
+      webStatus: null,
     },
     messages: '',
     authenticated: true,
@@ -58,7 +58,7 @@ export const mockExpStateSet = {
   unauthUser: {
     authError: {
       errorMessages: '',
-      webStatus: null
+      webStatus: null,
     },
     messages: '',
     authenticated: false,
@@ -73,10 +73,10 @@ export const mockExpStateSet = {
   fetchMessage: {
     authError: {
       errorMessages: '',
-      webStatus: null
+      webStatus: null,
     },
     messages: mockActionSet.FETCH_MESSAGE.payload,
     authenticated: false,
     authProcess: '',
-  }
+  },
 }

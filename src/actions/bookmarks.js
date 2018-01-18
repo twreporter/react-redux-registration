@@ -116,6 +116,9 @@ export function getBookmarks(apiUrl, userPath, bookmarkPath, offset, limit, sort
 export function getCurrentBookmark(apiUrl, userPath, bookmarkPath, bookmarkSlug, host) {
   return (dispatch) => {
     const { token, userId } = getNecessaryInfo()
+    if (!userId || !token) {
+      return Promise.reject('User\'s info is not stored in the localStorage')
+    }
     const axiosInstance = getAxiosInstance(token)
     const url = `${apiUrl}${userPath}/${userId}${bookmarkPath}/${bookmarkSlug}?host=${host}`
     // const path = `${apiEndpoints.users}/${userId}/${apiEndpoints.bookmarks}/${bookmarkSlug}?host=${host}`
